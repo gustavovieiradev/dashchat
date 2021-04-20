@@ -1,8 +1,9 @@
-import { Button, Flex, Stack } from '@chakra-ui/react'
+import { Button, Flex, Stack, useToast } from '@chakra-ui/react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Input } from '../components/Form/Input'
+import { useRouter } from 'next/router';
 
 type SignInFormData = {
   email: string;
@@ -15,6 +16,8 @@ const signInFormSchema = yup.object().shape({
 })
 
 export default function Signin() {
+  const router = useRouter();
+  const toast = useToast()
   const {register, handleSubmit, formState} = useForm({
     resolver: yupResolver(signInFormSchema)
   });
@@ -22,7 +25,18 @@ export default function Signin() {
   const {errors} = formState;
 
   const handleSignin: SubmitHandler<SignInFormData> = async (values) => {
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    if (values.email === 'admin@gmail.com' && values.password === '@bcd!23A') {
+      router.push('/dashboard')
+      return;
+    }
+    
+    toast({
+      title: "Usuário não encontrado",
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    })
+
   } 
 
   return (
