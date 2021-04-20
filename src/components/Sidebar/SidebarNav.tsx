@@ -9,10 +9,13 @@ export function SidebarNav() {
       <NavSection title="CHAT">
         <NavLink href="/chat" icon={RiDashboardLine} children="Chat" />
         <NavLink href="/intent" icon={RiDashboardLine} children="Intenções" />
+        <NavLink href="/conversas" icon={RiDashboardLine} children="Conversas" />
+        <NavLink href="/preview" icon={RiDashboardLine} children="Preview" />
       </NavSection>
 
-      <NavSection title="USUÁRIOS">
+      <NavSection title="ADMIN">
         <NavLink href="/users" icon={RiContactsLine} children="Usuários" />
+        <NavLink href="/clientes" icon={RiContactsLine} children="Clientes" />
       </NavSection>
 
       <NavLink href="/" icon={RiContactsLine} children="Sair" exact={true} />

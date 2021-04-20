@@ -11,12 +11,12 @@ export function Profile({showProfileData = true}: ProfileProps) {
         <Box mr="4" textAlign="right">
           <Text>Gustavo Vieira</Text>
           <Text color="gray.300" fontSize="small">
-            gustavovieira992@gmail.com
+            admin@gmail.com
               </Text>
         </Box>
       )}
 
-      <Avatar size="md" name="Gustavo Vieira" />
+      <Avatar size="md" name="Admin" />
     </Flex>
   )
 }

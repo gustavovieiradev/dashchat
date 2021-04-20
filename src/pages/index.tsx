@@ -26,7 +26,7 @@ export default function Signin() {
 
   const handleSignin: SubmitHandler<SignInFormData> = async (values) => {
     if (values.email === 'admin@gmail.com' && values.password === '@bcd!23A') {
-      router.push('/dashboard')
+      router.push('/chat')
       return;
     }
     
