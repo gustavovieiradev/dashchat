@@ -32,7 +32,7 @@ const SelectBase: ForwardRefRenderFunction<HTMLSelectElement, SelectProps> = ({ 
         {...rest}
       >
         {options.map(option => (
-          <option value={option.value}>{option.name}</option>
+          <option key={option.value} value={option.value}>{option.name}</option>
         ))}
       </ChakraSelect>
 
