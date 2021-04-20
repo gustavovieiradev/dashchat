@@ -1,10 +1,27 @@
+import { query as q } from 'faunadb';
 import { Box, Button, Checkbox, Flex, Heading, Icon, Table, Tbody, Td, Text, Th, Thead, Tr, useBreakpointValue } from "@chakra-ui/react";
+import { GetServerSideProps } from "next";
 import Link from "next/link";
-import { RiAddLine, RiPencilLine } from "react-icons/ri";
+import { RiAddLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
+import { fauna } from "../../services/fauna";
 
-export default function IntentList() {
+interface Intent {
+  ref: any;
+  name: string;
+  text_input: string;
+  text_output: string;
+  next_intent: string;
+}
+
+interface IntentProps {
+  intents: Intent[];
+}
+
+export default function IntentList({intents}: IntentProps) {
+
+  console.log(intents)
 
   return (
     <Box>
@@ -29,14 +46,18 @@ export default function IntentList() {
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>
-                  <Box>
-                    <Text fontWeight="bold">Nome da intencao</Text>
-                    <Text fontSize="sm" color="gray.300">Mensagem</Text>
-                  </Box>
-                </Td>
-              </Tr>
+              {intents.map(intent => (
+                <Tr key={intent.ref}>
+                  <Td>
+                    <Box>
+                      <Text fontWeight="bold">{intent.name}</Text>
+                      <Text fontSize="sm" color="gray.300">{intent.text_input}</Text>
+                      <Text fontSize="sm" color="gray.300">{intent.text_output}</Text>
+                      <Text fontSize="sm" color="gray.300">{intent.next_intent}</Text>
+                    </Box>
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
 
@@ -44,4 +65,35 @@ export default function IntentList() {
       </Flex>
     </Box>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async() => {
+  const response: any = await fauna.query(
+    q.Map(
+      q.Paginate(
+        q.Match(q.Index('ix_intent'))
+      ),
+      q.Lambda("X", q.Get(q.Var("X")))
+    )
+  )
+
+  // console.log(JSON.stringify(response, null, 2));
+
+  const intents = response.data.map(res => {
+    return {
+      ref: res.ref,
+      name: res.data.name,
+      text_input: res.data.text_input,
+      text_output: res.data.text_output,
+      next_intent: res.data.next_intent,
+    }
+  });
+
+  console.log(intents)
+  
+  return {
+    props: {
+      intents: JSON.parse(JSON.stringify(intents))
+    }
+  }
 }
