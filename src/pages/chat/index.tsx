@@ -18,6 +18,10 @@ export default function Chat() {
               <Text>Para ter o chat em qualquer página do seu site basta colar o seguinte código: </Text>
               <Code children={'<iframe src="http://192.168.0.210:3001" style={{position: "absolute", bottom: "10px", right: "10px", height: "800px", width: "400px"}} title="Iframe Example"></iframe>'} />
             </Box>
+            <Box w="100%">
+            <Text>Para ter o chat completo em qualquer página do seu site basta colar o seguinte código: </Text>
+              <Code children={'<iframe src="http://192.168.0.210:3001/chat" style={{position: "absolute", height: "100%", width: "100%"}} title="Iframe Example"></iframe>'} />
+            </Box>
           </VStack>
           {/* <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
