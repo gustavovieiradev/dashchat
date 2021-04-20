@@ -15,7 +15,8 @@ export function SidebarNav() {
 
       <NavSection title="ADMIN">
         <NavLink href="/users" icon={RiContactsLine} children="Usuários" />
-        <NavLink href="/clientes" icon={RiContactsLine} children="Clientes" />
+        <NavLink href="/clients" icon={RiContactsLine} children="Clientes" />
+        <NavLink href="/projects" icon={RiContactsLine} children="Projetos" />
       </NavSection>
 
       <NavLink href="/" icon={RiContactsLine} children="Sair" exact={true} />

@@ -47,14 +47,16 @@ export default function IntentList({intents}: IntentProps) {
             </Thead>
             <Tbody>
               {intents.map(intent => (
-                <Tr key={intent.ref}>
+                <Tr key={intent.name}>
                   <Td>
-                    <Box>
-                      <Text fontWeight="bold">{intent.name}</Text>
-                      <Text fontSize="sm" color="gray.300">{intent.text_input}</Text>
-                      <Text fontSize="sm" color="gray.300">{intent.text_output}</Text>
-                      <Text fontSize="sm" color="gray.300">{intent.next_intent}</Text>
-                    </Box>
+                    <Link href={`/intent/${intent.name}`} passHref>
+                      <Box cursor="pointer">
+                        <Text fontWeight="bold">{intent.name}</Text>
+                        <Text fontSize="sm" color="gray.300">{intent.text_input}</Text>
+                        <Text fontSize="sm" color="gray.300">{intent.text_output}</Text>
+                        <Text fontSize="sm" color="gray.300">{intent.next_intent}</Text>
+                      </Box>
+                    </Link>
                   </Td>
                 </Tr>
               ))}
@@ -76,8 +78,6 @@ export const getServerSideProps: GetServerSideProps = async() => {
       q.Lambda("X", q.Get(q.Var("X")))
     )
   )
-
-  // console.log(JSON.stringify(response, null, 2));
 
   const intents = response.data.map(res => {
     return {

@@ -1,4 +1,6 @@
 import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, useToast, VStack } from "@chakra-ui/react";
+import { query as q } from 'faunadb';
+import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -7,6 +9,7 @@ import { Select } from "../../components/Form/Select";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
+import { fauna } from "../../services/fauna";
 
 type IntentFormData = {
   name: string;
@@ -15,12 +18,27 @@ type IntentFormData = {
   next_intent: string;
 }
 
-export default function ShowIntent() {
+interface ShowIntentProps {
+  data: {
+    name: string;
+    text_input: string;
+    text_output: string;
+    next_intent: string;
+  }
+}
+
+export default function ShowIntent({data}: ShowIntentProps) {
   const router = useRouter();
   const toast = useToast()
-  const {register, handleSubmit, formState} = useForm();
+  const {register, handleSubmit, formState} = useForm({
+    defaultValues: {
+      name: data.name,
+      text_input: data.text_input,
+      text_output: data.text_output,
+    }
+  });
 
-  const {errors} = formState;
+  console.log(data);
 
   const handleSave: SubmitHandler<IntentFormData> = async (values) => {
     await api.post('/intent/create', values);
@@ -51,9 +69,6 @@ export default function ShowIntent() {
             <Box w="100%">
               <Input name="text_output" label="Texto de saída" {...register('text_output')} />
             </Box>
-            <Box w="100%">
-              <Select name="next_intent" label="Próxima intenção" options={[{value: 'texto', name: 'Texto'}, {value: 'button', name: 'Botões'}]} {...register('next_intent')}/>
-            </Box>
 
           </VStack>
           <Flex mt="8" justify="flex-end">
@@ -68,4 +83,22 @@ export default function ShowIntent() {
       </Flex>
     </Box>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async({params}) => {
+  const { intent } = params;
+  const response: any = await fauna.query(
+    q.Get(
+      q.Match(
+        q.Index('ix_intent_name'),
+        q.Casefold(intent)
+      )
+    )
+  )
+  
+  return {
+    props: {
+      data: response.data
+    }
+  }
 }
