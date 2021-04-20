@@ -20,9 +20,6 @@ interface IntentProps {
 }
 
 export default function IntentList({intents}: IntentProps) {
-
-  console.log(intents)
-
   return (
     <Box>
       <Header />
@@ -73,7 +70,7 @@ export const getServerSideProps: GetServerSideProps = async() => {
   const response: any = await fauna.query(
     q.Map(
       q.Paginate(
-        q.Match(q.Index('ix_intent'))
+        q.Match(q.Index('ix_intent')),
       ),
       q.Lambda("X", q.Get(q.Var("X")))
     )
@@ -88,8 +85,6 @@ export const getServerSideProps: GetServerSideProps = async() => {
       next_intent: res.data.next_intent,
     }
   });
-
-  console.log(intents)
   
   return {
     props: {

@@ -29,7 +29,7 @@ interface ShowIntentProps {
 
 export default function ShowIntent({data}: ShowIntentProps) {
   const router = useRouter();
-  const toast = useToast()
+  const toast = useToast();
   const {register, handleSubmit, formState} = useForm({
     defaultValues: {
       name: data.name,
