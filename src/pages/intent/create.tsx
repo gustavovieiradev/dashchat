@@ -22,7 +22,7 @@ export default function CreateIntent() {
               <Input name="message" label="Mensagem" />
             </Box>
             <Box w="100%">
-              <Select name="type" label="Próxima intenção" options={[{value: 'texto', name: 'Texto'}, {value: 'button', name: 'Botões'}]}/>
+              <Select name="next_intent" label="Próxima intenção" options={[{value: 'texto', name: 'Texto'}, {value: 'button', name: 'Botões'}]}/>
             </Box>
 
           </VStack>
