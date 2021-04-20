@@ -1,5 +1,6 @@
-import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, VStack } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, useToast, VStack } from "@chakra-ui/react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Input } from "../../components/Form/Input";
 import { Select } from "../../components/Form/Select";
@@ -15,12 +16,22 @@ type IntentFormData = {
 }
 
 export default function CreateIntent() {
+  const router = useRouter();
+  const toast = useToast()
   const {register, handleSubmit, formState} = useForm();
 
   const {errors} = formState;
 
   const handleSave: SubmitHandler<IntentFormData> = async (values) => {
     await api.post('/intent/create', values);
+    toast({
+      title: "Intenção salva com sucesso",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    })
+    router.push('/intent');
+
   } 
 
   return (

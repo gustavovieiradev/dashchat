@@ -3,7 +3,6 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Input } from '../components/Form/Input'
-import Iframe from 'react-iframe';
 
 type SignInFormData = {
   email: string;
