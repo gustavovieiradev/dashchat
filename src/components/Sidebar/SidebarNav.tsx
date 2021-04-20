@@ -6,14 +6,16 @@ import { NavSection } from "./NavSection";
 export function SidebarNav() {
   return (
     <Stack spacing="12" align="flex-start">
-      <NavSection title="GERAL">
-        <NavLink href="/dashboard" icon={RiDashboardLine} children="Dashboard" />
+      <NavSection title="CHAT">
+        <NavLink href="/chat" icon={RiDashboardLine} children="Chat" />
+        <NavLink href="/intent" icon={RiDashboardLine} children="Intenções" />
+      </NavSection>
+
+      <NavSection title="USUÁRIOS">
         <NavLink href="/users" icon={RiContactsLine} children="Usuários" />
       </NavSection>
-      <NavSection title="AUTOMAÇÃO">
-        <NavLink href="/form" icon={RiInputMethodLine} children="Formulários" />
-        <NavLink href="/automacao" icon={RiGitMergeLine} children="Automação" />
-      </NavSection>
+
+      <NavLink href="/" icon={RiContactsLine} children="Sair" exact={true} />
     </Stack>
   )
 }

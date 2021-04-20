@@ -19,14 +19,14 @@ export default function Chat() {
               <Code children={'<iframe src="http://192.168.0.210:3001" style={{position: "absolute", bottom: "10px", right: "10px", height: "800px", width: "400px"}} title="Iframe Example"></iframe>'} />
             </Box>
           </VStack>
-          <Flex mt="8" justify="flex-end">
+          {/* <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
               <Link href="/users" passHref>
                 <Button as="a" colorScheme="whiteAlpha">Cancelar</Button>
               </Link>
               <Button colorScheme="pink" type="submit">Salvar</Button>
             </HStack>
-          </Flex>
+          </Flex> */}
         </Box>
       </Flex>
     </Box>
