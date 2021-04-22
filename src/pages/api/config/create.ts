@@ -11,9 +11,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           { data: req.body }
         )
       )
-      return res.json({success: true});
+
+      return res.json({ success: true });
     } catch (err) {
-      return res.status(500).json({err})
+      return res.status(500).json({ err })
     }
   }
 }

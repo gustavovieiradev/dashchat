@@ -11,6 +11,7 @@ import { fauna } from "../../services/fauna";
 type ChatFormData = {
   title: string;
   theme: string;
+  oldTheme?: string;
 }
 
 interface ChatProps {
@@ -26,10 +27,13 @@ export default function Chat({data}: ChatProps) {
   });
   const toast = useToast();
 
-  console.log(data);
-
   const handleSave: SubmitHandler<ChatFormData> = async (values) => {
+    if (data.theme) {
+      values.oldTheme = data.theme;
+    }
+
     await api.post('/config/create', values);
+
     toast({
       title: "Configuração salva com sucesso",
       status: "success",
@@ -89,6 +93,7 @@ export default function Chat({data}: ChatProps) {
     </Box>
   )
 }
+
 export const getServerSideProps: GetServerSideProps = async() => {
   const response: any = await fauna.query(
     q.Map(
@@ -108,7 +113,7 @@ export const getServerSideProps: GetServerSideProps = async() => {
 
   return {
     props: {
-      data: config.length ? config[0] : {}
+      data: config.length ? config[config.length - 1] : {}
     }
   }
 }
