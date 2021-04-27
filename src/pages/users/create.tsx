@@ -20,6 +20,8 @@ type UserFormData = {
   id_client: string;
   id_project: string;
   client?: Client;
+  password?: string;
+  project?: Project;
 }
 
 interface Client {
@@ -49,14 +51,21 @@ export default function UserCreate({clients}: UserCreateProps) {
     const client = clients.find(c => values.id_client === c.id);
     values.client = client;
 
+    const project = projects.find(p => values.id_project === p.id);
+    values.project = project;
+
+    values.password = 'abcd1234';
+
     await api.post('/project/create', values);
+
     toast({
       title: "Projeto salvo com sucesso",
       status: "success",
       duration: 9000,
       isClosable: true,
     })
-    router.push('/projects');
+
+    router.push('/users');
   } 
 
   async function handleChangeClient(idClient: string) {
