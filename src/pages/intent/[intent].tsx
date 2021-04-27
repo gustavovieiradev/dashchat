@@ -38,8 +38,6 @@ export default function ShowIntent({data}: ShowIntentProps) {
     }
   });
 
-  console.log(data);
-
   const handleSave: SubmitHandler<IntentFormData> = async (values) => {
     await api.post('/intent/create', values);
     toast({

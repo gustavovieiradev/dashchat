@@ -3,7 +3,7 @@ import { forwardRef, ForwardRefRenderFunction } from "react";
 import { FieldError } from "react-hook-form";
 
 type Option = {
-  name: string;
+  id: string;
   value: string;
 }
 
@@ -32,7 +32,7 @@ const SelectBase: ForwardRefRenderFunction<HTMLSelectElement, SelectProps> = ({ 
         {...rest}
       >
         {options.map(option => (
-          <option key={option.value} value={option.value}>{option.name}</option>
+          <option style={{color: '#000'}} key={option.id} value={option.id}>{option.value}</option>
         ))}
       </ChakraSelect>
 

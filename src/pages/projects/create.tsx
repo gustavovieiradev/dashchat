@@ -6,12 +6,29 @@ import { Input } from "../../components/Form/Input";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
+import { v4 } from 'uuid';
+import { Select } from "../../components/Form/Select";
+import { GetServerSideProps } from "next";
+import { fauna } from "../../services/fauna";
+import { query as q } from 'faunadb';
 
 type ProjectsFormData = {
+  id: string;
   name: string;
+  id_client: string;
+  client?: Client;
 }
 
-export default function ClientCreate() {
+interface Client {
+  id: string;
+  value: string;
+}
+
+interface ProjectCreateProps {
+  clients: Client[];
+}
+
+export default function ProjectCreate({clients}: ProjectCreateProps) {
   const router = useRouter();
   const toast = useToast()
   const {register, handleSubmit, formState} = useForm();
@@ -19,15 +36,18 @@ export default function ClientCreate() {
   const {errors} = formState;
 
   const handleSave: SubmitHandler<ProjectsFormData> = async (values) => {
-    await api.post('/client/create', values);
+    values.id = v4();
+    const client = clients.find(c => values.id_client === c.id);
+    values.client = client;
+
+    await api.post('/project/create', values);
     toast({
-      title: "Intenção salva com sucesso",
+      title: "Projeto salvo com sucesso",
       status: "success",
       duration: 9000,
       isClosable: true,
     })
-    router.push('/clients');
-
+    router.push('/projects');
   } 
 
   return (
@@ -36,11 +56,14 @@ export default function ClientCreate() {
       <Flex as="form" w="100%" my="6" maxW={1480} mx="auto" px="6" onSubmit={handleSubmit(handleSave)}>
         <Sidebar />
         <Box flex="1" borderRadius={8} bg="gray.800" p={["6", "8"]}>
-          <Heading size="lg" fontWeight="normal">Criar cliente</Heading>
+          <Heading size="lg" fontWeight="normal">Criar projeto</Heading>
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
               <Input name="name" label="Nome do cliente" {...register('name')} />
+            </Box>
+            <Box w="100%">
+            <Select name="client" label="Cliente" {...register('id_client')} options={clients} />
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
@@ -55,4 +78,28 @@ export default function ClientCreate() {
       </Flex>
     </Box>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async() => {
+  const response: any = await fauna.query(
+    q.Map(
+      q.Paginate(
+        q.Match(q.Index('ix_client')),
+      ),
+      q.Lambda("X", q.Get(q.Var("X")))
+    )
+  )
+
+  const clients = response.data.map(res => {
+    return {
+      id: res.data.id,
+      value: res.data.name,
+    }
+  });
+  
+  return {
+    props: {
+      clients
+    }
+  }
 }

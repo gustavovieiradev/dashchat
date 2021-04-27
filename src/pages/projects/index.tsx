@@ -69,8 +69,6 @@ export const getServerSideProps: GetServerSideProps = async() => {
     )
   )
 
-  console.log(response);
-
   const clients = response.data.map(res => {
     return {
       name: res.data.name,
