@@ -7,15 +7,22 @@ import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { fauna } from "../../services/fauna";
 
-interface Client {
+interface Project {
+  id: string;
   name: string;
+  client: Client;
 }
 
-interface CLientProps {
-  clients: Client[];
+interface Client {
+  id: string;
+  value: string;
 }
 
-export default function Clients({clients}: CLientProps) {
+interface ProjectProps {
+  projects: Project[];
+}
+
+export default function Project({projects}: ProjectProps) {
   return (
     <Box>
       <Header />
@@ -23,9 +30,9 @@ export default function Clients({clients}: CLientProps) {
         <Sidebar />
         <Box flex="1" borderRadius={8} bg="gray.800" p="8">
           <Flex mb="8" justify="space-between" align="center">
-            <Heading size="lg" fontWeight="normal">Clientes</Heading>
+            <Heading size="lg" fontWeight="normal">Projetos</Heading>
 
-            <Link href="/clients/create" passHref>
+            <Link href="/projects/create" passHref>
               <Button as="a" size="sm" fontSize="sm" colorScheme="pink" leftIcon={<Icon as={RiAddLine} size="20" />}>
                 Criar novo
               </Button>
@@ -35,16 +42,24 @@ export default function Clients({clients}: CLientProps) {
           <Table colorScheme="whiteAlpha">
             <Thead>
               <Tr>
+                <Th>Projeto</Th>
                 <Th>Cliente</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {clients.map(client => (
-                <Tr key={client.name}>
+              {projects.map(project => (
+                <Tr key={project.id}>
                   <Td>
-                    <Link href={`/intent/${client.name}`} passHref>
+                    <Link href={`/projects/${project.id}`} passHref>
                       <Box cursor="pointer">
-                        <Text fontWeight="bold">{client.name}</Text>
+                        <Text fontWeight="bold">{project.name}</Text>
+                      </Box>
+                    </Link>
+                  </Td>
+                  <Td>
+                    <Link href={`/projects/${project.id}`} passHref>
+                      <Box cursor="pointer">
+                        <Text fontWeight="bold">{project.client.value}</Text>
                       </Box>
                     </Link>
                   </Td>
@@ -63,21 +78,23 @@ export const getServerSideProps: GetServerSideProps = async() => {
   const response: any = await fauna.query(
     q.Map(
       q.Paginate(
-        q.Match(q.Index('ix_client')),
+        q.Match(q.Index('ix_project')),
       ),
       q.Lambda("X", q.Get(q.Var("X")))
     )
   )
 
-  const clients = response.data.map(res => {
+  const projects = response.data.map(res => {
     return {
       name: res.data.name,
+      id: res.data.id,
+      client: res.data.client,
     }
   });
   
   return {
     props: {
-      clients
+      projects
     }
   }
 }
