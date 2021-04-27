@@ -61,7 +61,7 @@ export default function UserCreate({clients}: UserCreateProps) {
     await api.post('/project/create', values);
 
     toast({
-      title: "Projeto salvo com sucesso",
+      title: "Usuário salvo com sucesso",
       status: "success",
       duration: 9000,
       isClosable: true,
