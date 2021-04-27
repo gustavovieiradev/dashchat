@@ -58,7 +58,7 @@ export default function UserCreate({clients}: UserCreateProps) {
     values.password = 'abcd1234';
     values.profile = 'user';
 
-    await api.post('/project/create', values);
+    await api.post('/user/create', values);
 
     toast({
       title: "Usuário salvo com sucesso",
