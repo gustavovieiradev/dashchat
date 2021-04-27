@@ -22,6 +22,7 @@ type UserFormData = {
   client?: Client;
   password?: string;
   project?: Project;
+  profile?: string;
 }
 
 interface Client {
@@ -55,6 +56,7 @@ export default function UserCreate({clients}: UserCreateProps) {
     values.project = project;
 
     values.password = 'abcd1234';
+    values.profile = 'user';
 
     await api.post('/project/create', values);
 
