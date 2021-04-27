@@ -2,15 +2,13 @@ import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, useToast, VSta
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { uuid } from "uuidv4";
 import { Input } from "../../components/Form/Input";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
 
-type ClientFormData = {
+type ProjectsFormData = {
   name: string;
-  id: string;
 }
 
 export default function ClientCreate() {
@@ -20,8 +18,7 @@ export default function ClientCreate() {
 
   const {errors} = formState;
 
-  const handleSave: SubmitHandler<ClientFormData> = async (values) => {
-    values.id = uuid();
+  const handleSave: SubmitHandler<ProjectsFormData> = async (values) => {
     await api.post('/client/create', values);
     toast({
       title: "Intenção salva com sucesso",
