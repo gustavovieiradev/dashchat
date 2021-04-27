@@ -11,6 +11,7 @@ import { Select } from "../../components/Form/Select";
 import { GetServerSideProps } from "next";
 import { fauna } from "../../services/fauna";
 import { query as q } from 'faunadb';
+import { useState } from "react";
 
 type UserFormData = {
   id: string;
@@ -26,6 +27,11 @@ interface Client {
   value: string;
 }
 
+interface Project {
+  id: string;
+  value: string;
+}
+
 interface UserCreateProps {
   clients: Client[];
 }
@@ -34,6 +40,7 @@ export default function UserCreate({clients}: UserCreateProps) {
   const router = useRouter();
   const toast = useToast()
   const {register, handleSubmit, formState} = useForm();
+  const [projects, setProjects] = useState<Project[]>([]);
 
   const {errors} = formState;
 
@@ -52,6 +59,26 @@ export default function UserCreate({clients}: UserCreateProps) {
     router.push('/projects');
   } 
 
+  async function handleChangeClient(idClient: string) {
+    if (!idClient) {
+      return;
+    }
+
+    const projectsResponse = await api.get(`/project/clientId`, {params: {id: idClient}});
+
+    console.log(projectsResponse.data.data);
+
+    const formatProject = projectsResponse.data.data.map(project => {
+      return {
+        id: project.data.id,
+        value: project.data.name
+      }
+    }) 
+
+    setProjects(formatProject);
+    
+  }
+
   return (
     <Box>
       <Header />
@@ -68,10 +95,10 @@ export default function UserCreate({clients}: UserCreateProps) {
               <Input name="name" label="E-mail" {...register('email')} />
             </Box>
             <Box w="100%">
-              <Select placeholder="Selecione" name="client" label="Cliente" {...register('id_client')} options={clients} />
+              <Select placeholder="Selecione" name="client" label="Cliente" {...register('id_client')} options={clients} onChange={(ev) => handleChangeClient(ev.target.value)} />
             </Box>
             <Box w="100%">
-              <Select placeholder="Selecione" name="client" label="Projetos" {...register('id_project')} options={clients} />
+              <Select placeholder="Selecione" name="client" label="Projetos" {...register('id_project')} options={projects} />
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
