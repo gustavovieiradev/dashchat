@@ -19,7 +19,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           ])
         )
       );
-    
       return res.json(user);
     } catch(err) {
       res.status(400).json(err);

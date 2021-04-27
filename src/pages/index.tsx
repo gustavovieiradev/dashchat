@@ -33,7 +33,7 @@ export default function Signin() {
 
     try {
       const user = await api.post('/user/login', values);
-      console.log(user);
+      router.push('/chat')
     } catch(err) {
       console.log('user');
       toast({
