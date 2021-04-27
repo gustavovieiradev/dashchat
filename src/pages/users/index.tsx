@@ -29,17 +29,11 @@ export default function UserList() {
           <Table colorScheme="whiteAlpha">
             <Thead>
               <Tr>
-                <Th px="6" color="gray.300" width="8">
-                  <Checkbox colorScheme="pink" />
-                </Th>
                 <Th>Usuário</Th>
               </Tr>
             </Thead>
             <Tbody>
               <Tr>
-                <Td px="6">
-                  <Checkbox colorScheme="pink" />
-                </Td>
                 <Td>
                   <Box>
                     <Text fontWeight="bold">Gustavo Vieira</Text>
