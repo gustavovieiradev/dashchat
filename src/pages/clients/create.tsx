@@ -3,7 +3,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Input } from "../../components/Form/Input";
-import { Select } from "../../components/Form/Select";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
@@ -20,14 +19,14 @@ export default function ClientCreate() {
   const {errors} = formState;
 
   const handleSave: SubmitHandler<ClientFormData> = async (values) => {
-    // await api.post('/client/create', values);
+    await api.post('/client/create', values);
     toast({
       title: "Intenção salva com sucesso",
       status: "success",
       duration: 9000,
       isClosable: true,
     })
-    router.push('/client');
+    router.push('/clients');
 
   } 
 
