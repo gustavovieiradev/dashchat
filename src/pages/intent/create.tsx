@@ -7,15 +7,29 @@ import { Select } from "../../components/Form/Select";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
+import { v4 } from 'uuid';
+import { GetServerSideProps } from "next";
+import { fauna } from "../../services/fauna";
+import { query as q } from 'faunadb';
 
 type IntentFormData = {
   name: string;
   text_input: string;
   text_output: string;
   next_intent: string;
+  id_project: string;
 }
 
-export default function CreateIntent() {
+interface Project {
+  id: string;
+  value: string;
+}
+
+interface CreateIntentProps {
+  projects: Project[];
+}
+
+export default function CreateIntent({projects}: CreateIntentProps) {
   const router = useRouter();
   const toast = useToast()
   const {register, handleSubmit, formState} = useForm();
@@ -23,7 +37,15 @@ export default function CreateIntent() {
   const {errors} = formState;
 
   const handleSave: SubmitHandler<IntentFormData> = async (values) => {
-    await api.post('/intent/create', values);
+    const params = {
+      ...values,
+      id: v4(),
+      project: projects.find(p => values.id_project === p.id)
+    };
+
+    delete params.id_project;
+
+    await api.post('/intent/create', params);
     toast({
       title: "Intenção salva com sucesso",
       status: "success",
@@ -44,6 +66,9 @@ export default function CreateIntent() {
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
+              <Select name="next_intent" label="Projeto" options={projects} {...register('id_project')}/>
+            </Box>
+            <Box w="100%">
               <Input name="name" label="Nome da intenção" {...register('name')} />
             </Box>
             <Box w="100%">
@@ -52,10 +77,6 @@ export default function CreateIntent() {
             <Box w="100%">
               <Input name="text_output" label="Texto de saída" {...register('text_output')} />
             </Box>
-            <Box w="100%">
-              <Select name="next_intent" label="Próxima intenção" options={[{value: 'texto', name: 'Texto'}, {value: 'button', name: 'Botões'}]} {...register('next_intent')}/>
-            </Box>
-
           </VStack>
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
@@ -69,4 +90,28 @@ export default function CreateIntent() {
       </Flex>
     </Box>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async() => {
+  const response: any = await fauna.query(
+    q.Map(
+      q.Paginate(
+        q.Match(q.Index('ix_project')),
+      ),
+      q.Lambda("X", q.Get(q.Var("X")))
+    )
+  )
+
+  const projects = response.data.map(res => {
+    return {
+      id: res.data.id,
+      value: res.data.name,
+    }
+  });
+  
+  return {
+    props: {
+      projects
+    }
+  }
 }
