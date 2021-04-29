@@ -73,14 +73,14 @@ export default function ClientEdit({data}: ClientEditProps) {
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
               <Button as="a" colorScheme="whiteAlpha" onClick={() => router.back()}>Cancelar</Button>
-              <Button as="a" colorScheme="pink" type="button" onClick={() => setIsOpenAlert(true)}>Excluir</Button>
+              <Button as="a" colorScheme="red" type="button" onClick={() => setIsOpenAlert(true)}>Excluir</Button>
               <Button colorScheme="pink" isLoading={formState.isSubmitting} type="submit">Editar</Button>
             </HStack>
           </Flex>
         </Box>
       </Flex>
 
-      {isOpenAlert && <Alert closeAlert={() => setIsOpenAlert(false)}/>}
+      {isOpenAlert && <Alert closeAlert={() => setIsOpenAlert(false)} description={`Deseja realmente excluir o cliente ${data.name}`} title="Excluir cliente" />}
 
     </Box>
   )

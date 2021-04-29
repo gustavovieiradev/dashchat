@@ -4,9 +4,11 @@ import { useRef, useState } from "react";
 
 interface AlertProps {
   closeAlert: () => void;
+  title: string;
+  description: string;
 }
 
-export function Alert({closeAlert}: AlertProps) {
+export function Alert({closeAlert, title, description}: AlertProps) {
   const [isOpen, setIsOpen] = useState(true)
   const cancelRef = useRef()
 
@@ -22,17 +24,17 @@ export function Alert({closeAlert}: AlertProps) {
       onClose={onClose}
     >
       <AlertDialogOverlay>
-        <AlertDialogContent>
+        <AlertDialogContent bg="gray.900">
           <AlertDialogHeader fontSize="lg" fontWeight="bold">
-            Delete Customer
+            {title}
           </AlertDialogHeader>
 
           <AlertDialogBody>
-            Are you sure? You can't undo this action afterwards.
+            {description}
           </AlertDialogBody>
 
           <AlertDialogFooter>
-            <Button ref={cancelRef} onClick={onClose}>
+            <Button ref={cancelRef} onClick={onClose} colorScheme="whiteAlpha">
               Cancel
             </Button>
             <Button colorScheme="red" onClick={onClose} ml={3}>
