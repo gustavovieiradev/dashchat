@@ -12,6 +12,8 @@ import { GetServerSideProps } from "next";
 import { fauna } from "../../services/fauna";
 import { query as q } from 'faunadb';
 import { useState } from "react";
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 type UserFormData = {
   id: string;
@@ -39,10 +41,19 @@ interface UserCreateProps {
   clients: Client[];
 }
 
+const formSchema = yup.object().shape({
+  name: yup.string().required('Campo obrigatório'),
+  email: yup.string().required('Campo obrigatório'),
+  id_client: yup.string().required('Campo obrigatório'),
+  id_project: yup.string().required('Campo obrigatório'),
+})
+
 export default function UserCreate({clients}: UserCreateProps) {
   const router = useRouter();
   const toast = useToast()
-  const {register, handleSubmit, formState} = useForm();
+  const {register, handleSubmit, formState} = useForm({
+    resolver: yupResolver(formSchema)
+  });
   const [projects, setProjects] = useState<Project[]>([]);
 
   const {errors} = formState;
@@ -100,16 +111,16 @@ export default function UserCreate({clients}: UserCreateProps) {
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
-              <Input name="name" label="Nome do usuário" {...register('name')} />
+              <Input name="name" label="Nome do usuário" {...register('name')} error={errors.name} />
             </Box>
             <Box w="100%">
-              <Input name="name" label="E-mail" {...register('email')} />
+              <Input name="name" label="E-mail" {...register('email')} error={errors.email} />
             </Box>
             <Box w="100%">
-              <Select placeholder="Selecione" name="client" label="Cliente" {...register('id_client')} options={clients} onChange={(ev) => handleChangeClient(ev.target.value)} />
+              <Select placeholder="Selecione" name="client" label="Cliente" {...register('id_client')} options={clients} onChange={(ev) => handleChangeClient(ev.target.value)} error={errors.id_client}/>
             </Box>
             <Box w="100%">
-              <Select placeholder="Selecione" name="client" label="Projetos" {...register('id_project')} options={projects} />
+              <Select placeholder="Selecione" name="project" label="Projetos" {...register('id_project')} options={projects} error={errors.id_project}/>
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
