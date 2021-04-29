@@ -135,7 +135,10 @@ export default function UserCreate({clients}: UserCreateProps) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async() => {
+export const getServerSideProps: GetServerSideProps = async({req}) => {
+
+  console.log(req.headers.cookie);
+
   const response: any = await fauna.query(
     q.Map(
       q.Paginate(

@@ -79,7 +79,7 @@ export default function ProjectEdit({clients, project}: ProjectEditProps) {
               <Input name="name" label="Nome do cliente" {...register('name')} error={errors.name}/>
             </Box>
             <Box w="100%">
-            <Select name="client" placeholder="Selecione" label="Cliente" {...register('id_client')} options={clients} error={errors.id_client}/>
+              <Select name="client" placeholder="Selecione" label="Cliente" {...register('id_client')} options={clients} error={errors.id_client}/>
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
