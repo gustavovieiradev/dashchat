@@ -65,8 +65,6 @@ export default function UserCreate({clients}: UserCreateProps) {
 
     const project = projects.find(p => values.id_project === p.id);
     values.project = project;
-
-    values.password = 'abcd1234';
     values.profile = 'user';
 
     await api.post('/user/create', values);
