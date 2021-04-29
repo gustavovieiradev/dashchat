@@ -2,56 +2,68 @@ import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, useToast, VSta
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { v4 } from "uuid";
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { Input } from "../../components/Form/Input";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
+import { Select } from "../../components/Form/Select";
 import { GetServerSideProps } from "next";
-import { query as q } from 'faunadb';
 import { fauna } from "../../services/fauna";
+import { query as q } from 'faunadb';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
-type ClientFormData = {
-  name: string;
+type ProjectsFormData = {
   id: string;
+  name: string;
+  id_client: string;
+  client?: Client;
 }
 
-interface ClientEditProps {
-  data: {
+interface Client {
+  id: string;
+  value: string;
+}
+
+interface ProjectEditProps {
+  clients: Client[];
+  project: {
     name: string;
-    id: string;
+    id_client: string;
   }
 }
 
 const formSchema = yup.object().shape({
   name: yup.string().required('Campo obrigatório'),
+  id_client: yup.string().required('Campo obrigatório'),
 })
 
-export default function ClientEdit({data}: ClientEditProps) {
+export default function ProjectEdit({clients, project}: ProjectEditProps) {
   const router = useRouter();
   const toast = useToast()
   const {register, handleSubmit, formState} = useForm({
     resolver: yupResolver(formSchema),
     defaultValues: {
-      name: data.name
+      name: project.name,
+      id_client: project.id_client,
     }
   });
 
   const {errors} = formState;
 
-  const handleSave: SubmitHandler<ClientFormData> = async (values) => {
+  const handleSave: SubmitHandler<ProjectsFormData> = async (values) => {
     values.id = String(router.query.id);
-    await api.post('/client/update', values);
+    const client = clients.find(c => values.id_client === c.id);
+    values.client = client;
+
+    await api.post('/project/update', values);
     toast({
-      title: "Intenção atualizada com sucesso",
+      title: "Projeto salvo com sucesso",
       status: "success",
       duration: 9000,
       isClosable: true,
     })
-    router.push('/clients');
-
+    router.push('/projects');
   } 
 
   return (
@@ -60,11 +72,14 @@ export default function ClientEdit({data}: ClientEditProps) {
       <Flex as="form" w="100%" my="6" maxW={1480} mx="auto" px="6" onSubmit={handleSubmit(handleSave)}>
         <Sidebar />
         <Box flex="1" borderRadius={8} bg="gray.800" p={["6", "8"]}>
-          <Heading size="lg" fontWeight="normal">Criar cliente</Heading>
+          <Heading size="lg" fontWeight="normal">Criar projeto</Heading>
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
-              <Input name="name" label="Nome do cliente" {...register('name')} error={errors.name} />
+              <Input name="name" label="Nome do cliente" {...register('name')} error={errors.name}/>
+            </Box>
+            <Box w="100%">
+            <Select name="client" placeholder="Selecione" label="Cliente" {...register('id_client')} options={clients} error={errors.id_client}/>
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
@@ -82,11 +97,27 @@ export default function ClientEdit({data}: ClientEditProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async({params}) => {
-  const { id } = params;
   const response: any = await fauna.query(
+    q.Map(
+      q.Paginate(
+        q.Match(q.Index('ix_client')),
+      ),
+      q.Lambda("X", q.Get(q.Var("X")))
+    )
+  )
+
+  const clients = response.data.map(res => {
+    return {
+      id: res.data.id,
+      value: res.data.name,
+    }
+  });
+
+  const { id } = params;
+  const responseProject: any = await fauna.query(
     q.Get(
       q.Match(
-        q.Index('ix_client_id'),
+        q.Index('ix_project_id'),
         id
       )
     )
@@ -94,7 +125,8 @@ export const getServerSideProps: GetServerSideProps = async({params}) => {
   
   return {
     props: {
-      data: response.data
+      clients,
+      project: responseProject.data
     }
   }
 }
