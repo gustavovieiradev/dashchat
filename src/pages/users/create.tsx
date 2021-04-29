@@ -88,8 +88,6 @@ export default function UserCreate({clients}: UserCreateProps) {
 
     const projectsResponse = await api.get(`/project/clientId`, {params: {id: idClient}});
 
-    console.log(projectsResponse.data.data);
-
     const formatProject = projectsResponse.data.data.map(project => {
       return {
         id: project.data.id,

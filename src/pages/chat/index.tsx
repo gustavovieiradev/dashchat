@@ -7,6 +7,7 @@ import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
 import { fauna } from "../../services/fauna";
+import { Select } from "../../components/Form/Select";
 
 type ChatFormData = {
   title: string;
@@ -16,13 +17,20 @@ type ChatFormData = {
 
 interface ChatProps {
   data: ChatFormData;
+  projects: Project[];
 }
 
-export default function Chat({data}: ChatProps) {
+interface Project {
+  id: string;
+  value: string;
+}
+
+export default function Chat({data, projects}: ChatProps) {
   const {register, handleSubmit, formState} = useForm({
     defaultValues: {
       title: data.title,
-      theme: data.theme
+      theme: data.theme,
+      id_project: null
     }
   });
   const toast = useToast();
@@ -51,6 +59,9 @@ export default function Chat({data}: ChatProps) {
           <Heading size="lg" fontWeight="normal">Informações do chat</Heading>
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
+            <Box w="100%">
+              <Select name="client" placeholder="Selecione" label="Projeto" {...register('id_project')} options={projects} />
+            </Box>
             <Box w="100%">
               <Text fontWeight="medium" mb="2">Para ter o chat em qualquer página do seu site basta colar o seguinte código: </Text>
               <Code children={'<iframe src="http://192.168.0.210:3001" style={{position: "absolute", bottom: "10px", right: "10px", height: "800px", width: "400px"}} title="Iframe Example"></iframe>'} />
@@ -111,9 +122,26 @@ export const getServerSideProps: GetServerSideProps = async() => {
     }
   });
 
+  const responseProject: any = await fauna.query(
+    q.Map(
+      q.Paginate(
+        q.Match(q.Index('ix_project')),
+      ),
+      q.Lambda("X", q.Get(q.Var("X")))
+    )
+  )
+
+  const projects = responseProject.data.map(res => {
+    return {
+      value: res.data.name,
+      id: res.data.id,
+    }
+  });
+
   return {
     props: {
-      data: config.length ? config[config.length - 1] : {}
+      data: config.length ? config[config.length - 1] : {},
+      projects
     }
   }
 }
