@@ -3,6 +3,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { v4 } from "uuid";
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Input } from "../../components/Form/Input";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
@@ -13,10 +15,16 @@ type ClientFormData = {
   id: string;
 }
 
+const formSchema = yup.object().shape({
+  name: yup.string().required('Campo obrigatório'),
+})
+
 export default function ClientCreate() {
   const router = useRouter();
   const toast = useToast()
-  const {register, handleSubmit, formState} = useForm();
+  const {register, handleSubmit, formState} = useForm({
+    resolver: yupResolver(formSchema)
+  });
 
   const {errors} = formState;
 
@@ -43,7 +51,7 @@ export default function ClientCreate() {
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
-              <Input name="name" label="Nome do cliente" {...register('name')} />
+              <Input name="name" label="Nome do cliente" {...register('name')} error={errors.name} />
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
