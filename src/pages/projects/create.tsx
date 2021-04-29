@@ -11,6 +11,8 @@ import { Select } from "../../components/Form/Select";
 import { GetServerSideProps } from "next";
 import { fauna } from "../../services/fauna";
 import { query as q } from 'faunadb';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 type ProjectsFormData = {
   id: string;
@@ -28,10 +30,17 @@ interface ProjectCreateProps {
   clients: Client[];
 }
 
+const formSchema = yup.object().shape({
+  name: yup.string().required('Campo obrigatório'),
+  id_client: yup.string().required('Campo obrigatório'),
+})
+
 export default function ProjectCreate({clients}: ProjectCreateProps) {
   const router = useRouter();
   const toast = useToast()
-  const {register, handleSubmit, formState} = useForm();
+  const {register, handleSubmit, formState} = useForm({
+    resolver: yupResolver(formSchema)
+  });
 
   const {errors} = formState;
 
@@ -60,10 +69,10 @@ export default function ProjectCreate({clients}: ProjectCreateProps) {
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
-              <Input name="name" label="Nome do cliente" {...register('name')} />
+              <Input name="name" label="Nome do cliente" {...register('name')} error={errors.name}/>
             </Box>
             <Box w="100%">
-            <Select name="client" label="Cliente" {...register('id_client')} options={clients} />
+            <Select name="client" placeholder="Selecione" label="Cliente" {...register('id_client')} options={clients} error={errors.id_client}/>
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
