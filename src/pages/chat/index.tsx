@@ -8,6 +8,7 @@ import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
 import { fauna } from "../../services/fauna";
 import { Select } from "../../components/Form/Select";
+import { useEffect, useState } from "react";
 
 type ChatFormData = {
   title: string;
@@ -26,6 +27,7 @@ interface Project {
 }
 
 export default function Chat({data, projects}: ChatProps) {
+  const [projectSelected, setProjectSelected] = useState('');
   const {register, handleSubmit, formState} = useForm({
     defaultValues: {
       title: data.title,
@@ -50,6 +52,10 @@ export default function Chat({data, projects}: ChatProps) {
     })
   } 
 
+  useEffect(() => {
+    console.log(projectSelected);
+  }, [projectSelected])
+
   return (
     <Box>
       <Header />
@@ -58,47 +64,51 @@ export default function Chat({data, projects}: ChatProps) {
         <Box flex="1" borderRadius={8} bg="gray.800" p={["6", "8"]}>
           <Heading size="lg" fontWeight="normal">Informações do chat</Heading>
           <Divider my="6" borderColor="gray.700" />
-          <VStack spacing="8">
-            <Box w="100%">
-              <Select name="client" placeholder="Selecione" label="Projeto" {...register('id_project')} options={projects} />
-            </Box>
-            <Box w="100%">
-              <Text fontWeight="medium" mb="2">Para ter o chat em qualquer página do seu site basta colar o seguinte código: </Text>
-              <Code children={'<iframe src="http://192.168.0.210:3001" style={{position: "absolute", bottom: "10px", right: "10px", height: "800px", width: "400px"}} title="Iframe Example"></iframe>'} />
-            </Box>
-            <Box w="100%">
-              <Text fontWeight="medium" mb="2">Para ter o chat completo em qualquer página do seu site basta colar o seguinte código: </Text>
-              <Code children={'<iframe src="http://192.168.0.210:3001/chat" style={{position: "absolute", height: "100%", width: "100%"}} title="Iframe Example"></iframe>'} />
-            </Box>
-            <Box w="100%">
-              <Input name="title" label="Título" {...register('title')} />
-            </Box>
-            <Box w="100%">
-              <Text fontWeight="medium" mb="2">Selecione o tema: </Text>
-              <RadioGroup defaultValue={data.theme}>
-                <HStack align="start">
-                  <Box bg="black" p="2" borderRadius="5">
-                    <Radio value="black" colorScheme="black" {...register('theme')}>Preto e branco</Radio>
-                  </Box>
-                  <Box bg="red.500" p="2" borderRadius="5">
-                    <Radio value="red" colorScheme="red" {...register('theme')}>Vermelho e branco</Radio>
-                  </Box>
-                  <Box bg="green.500" p="2" borderRadius="5">
-                    <Radio value="green" colorScheme="green" {...register('theme')}>Verde e branco</Radio>
-                  </Box>
-                  <Box bg="blue.500" p="2" borderRadius="5">
-                    <Radio value="blue" colorScheme="blue" {...register('theme')}>Azul e branco</Radio>
-                  </Box>
-                </HStack>
-              </RadioGroup>
-            </Box>
+          <Box w="100%" marginBottom="8">
+            <Select name="project" placeholder="Selecione" label="Projeto" {...register('id_project')} options={projects} onChange={(ev) => setProjectSelected(ev.target.value)} />
+          </Box>
+          {projectSelected && (
+            <Box>
+              <VStack spacing="8">
+                <Box w="100%">
+                  <Text fontWeight="medium" mb="2">Para ter o chat em qualquer página do seu site basta colar o seguinte código: </Text>
+                  <Code children={`<iframe src="http://192.168.0.210:3001/${projectSelected}" style={{position: "absolute", bottom: "10px", right: "10px", height: "800px", width: "400px"}} title="Iframe Example"></iframe>`} />
+                </Box>
+                <Box w="100%">
+                  <Text fontWeight="medium" mb="2">Para ter o chat completo em qualquer página do seu site basta colar o seguinte código: </Text>
+                  <Code children={`<iframe src="http://192.168.0.210:3001/chat/${projectSelected}" style={{position: "absolute", height: "100%", width: "100%"}} title="Iframe Example"></iframe>`} />
+                </Box>
+                <Box w="100%">
+                  <Input name="title" label="Título" {...register('title')} />
+                </Box>
+                <Box w="100%">
+                  <Text fontWeight="medium" mb="2">Selecione o tema: </Text>
+                  <RadioGroup defaultValue={data.theme}>
+                    <HStack align="start">
+                      <Box bg="black" p="2" borderRadius="5">
+                        <Radio value="black" colorScheme="black" {...register('theme')}>Preto e branco</Radio>
+                      </Box>
+                      <Box bg="red.500" p="2" borderRadius="5">
+                        <Radio value="red" colorScheme="red" {...register('theme')}>Vermelho e branco</Radio>
+                      </Box>
+                      <Box bg="green.500" p="2" borderRadius="5">
+                        <Radio value="green" colorScheme="green" {...register('theme')}>Verde e branco</Radio>
+                      </Box>
+                      <Box bg="blue.500" p="2" borderRadius="5">
+                        <Radio value="blue" colorScheme="blue" {...register('theme')}>Azul e branco</Radio>
+                      </Box>
+                    </HStack>
+                  </RadioGroup>
+                </Box>
 
-          </VStack>
-          <Flex mt="8" justify="flex-end">
-            <HStack spacing="4">
-              <Button colorScheme="pink" type="submit">Salvar</Button>
-            </HStack>
-          </Flex>
+              </VStack>
+              <Flex mt="8" justify="flex-end">
+                <HStack spacing="4">
+                  {/* <Button colorScheme="pink" type="submit">Salvar</Button> */}
+                </HStack>
+              </Flex>
+            </Box>  
+          )}
         </Box>
       </Flex>
     </Box>
