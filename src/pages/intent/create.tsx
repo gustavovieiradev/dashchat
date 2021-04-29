@@ -77,7 +77,7 @@ export default function CreateIntent({projects}: CreateIntentProps) {
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
-              <Select name="next_intent" placeholder="Selecione" label="Projeto" options={projects} {...register('id_project')} error={errors.id_project} />
+              <Select name="project" placeholder="Selecione" label="Projeto" options={projects} {...register('id_project')} error={errors.id_project} />
             </Box>
             <Box w="100%">
               <Input name="name" label="Nome da intenção" {...register('name')} error={errors.name} />
