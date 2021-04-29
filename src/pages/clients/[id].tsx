@@ -12,6 +12,8 @@ import { api } from "../../services/api";
 import { GetServerSideProps } from "next";
 import { query as q } from 'faunadb';
 import { fauna } from "../../services/fauna";
+import { Alert } from "../../components/Alert";
+import { useState } from "react";
 
 type ClientFormData = {
   name: string;
@@ -38,6 +40,7 @@ export default function ClientEdit({data}: ClientEditProps) {
       name: data.name
     }
   });
+  const [isOpenAlert, setIsOpenAlert] = useState(false);
 
   const {errors} = formState;
 
@@ -69,20 +72,23 @@ export default function ClientEdit({data}: ClientEditProps) {
           </VStack>
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Link href="/client" passHref>
-                <Button as="a" colorScheme="whiteAlpha">Cancelar</Button>
-              </Link>
-              <Button colorScheme="pink" isLoading={formState.isSubmitting} type="submit">Salvar</Button>
+              <Button as="a" colorScheme="whiteAlpha" onClick={() => router.back()}>Cancelar</Button>
+              <Button as="a" colorScheme="pink" type="button" onClick={() => setIsOpenAlert(true)}>Excluir</Button>
+              <Button colorScheme="pink" isLoading={formState.isSubmitting} type="submit">Editar</Button>
             </HStack>
           </Flex>
         </Box>
       </Flex>
+
+      {isOpenAlert && <Alert closeAlert={() => setIsOpenAlert(false)}/>}
+
     </Box>
   )
 }
 
 export const getServerSideProps: GetServerSideProps = async({params}) => {
   const { id } = params;
+  console.log(id)
   const response: any = await fauna.query(
     q.Get(
       q.Match(

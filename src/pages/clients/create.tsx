@@ -56,9 +56,7 @@ export default function ClientCreate() {
           </VStack>
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Link href="/client" passHref>
-                <Button as="a" colorScheme="whiteAlpha">Cancelar</Button>
-              </Link>
+              <Button as="a" colorScheme="whiteAlpha" onClick={() => router.back()}>Cancelar</Button>
               <Button colorScheme="pink" isLoading={formState.isSubmitting} type="submit">Salvar</Button>
             </HStack>
           </Flex>
