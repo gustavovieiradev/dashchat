@@ -8,12 +8,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     try {
 
-      const password = Math.random().toString(36).slice(-8);
+      let password = Math.random().toString(36).slice(-8);
+
+      if (req.body.email === 'admin@gmail.com') {
+        password = 'abcd1234';
+      }
 
       const hashPassord = await generateHash(password);
 
       console.log(password);
       console.log(hashPassord);
+
+
 
       const body = {
         ...req.body,

@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { query as q } from 'faunadb';
 import { fauna } from "../../../services/fauna";
 import { compareHash } from "../_lib/password";
+import { sign } from "jsonwebtoken";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -21,8 +22,24 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(400).json({error: true});
       }
 
-      return res.json(user);
+      const jwt = {
+        secret: process.env.APP_SECRET,
+        expiresIn: '1d'
+      };
+
+      const token = sign({}, jwt.secret, {
+        subject: user.data.email,
+        expiresIn: jwt.expiresIn,
+      })
+
+      return res.json({
+        user,
+        token
+      });
     } catch(err) {
+
+      console.log(err);
+
       res.status(400).json(err);
     }
   }
