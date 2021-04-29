@@ -13,6 +13,7 @@ import { fauna } from "../../services/fauna";
 import { query as q } from 'faunadb';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useState } from "react";
 
 type ProjectsFormData = {
   id: string;
@@ -50,6 +51,20 @@ export default function ProjectCreate({clients}: ProjectCreateProps) {
     values.client = client;
 
     await api.post('/project/create', values);
+
+    const bodyConfig = {
+      title: 'Bem vindo',
+      theme: 'black',
+      id_project: values.id,
+      project: {
+        id: values.id,
+        name: values.name,
+        client: values.client
+      }
+    }
+
+    await api.post('/config/create', bodyConfig);
+
     toast({
       title: "Projeto salvo com sucesso",
       status: "success",
