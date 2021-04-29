@@ -9,6 +9,7 @@ import { fauna } from "../../services/fauna";
 
 interface Client {
   name: string;
+  id: string;
 }
 
 interface CLientProps {
@@ -42,7 +43,7 @@ export default function Clients({clients}: CLientProps) {
               {clients.map(client => (
                 <Tr key={client.name}>
                   <Td>
-                    <Link href={`/intent/${client.name}`} passHref>
+                    <Link href={`/clients/${client.id}`} passHref>
                       <Box cursor="pointer">
                         <Text fontWeight="bold">{client.name}</Text>
                       </Box>
@@ -72,6 +73,7 @@ export const getServerSideProps: GetServerSideProps = async() => {
   const clients = response.data.map(res => {
     return {
       name: res.data.name,
+      id: res.data.id,
     }
   });
   
