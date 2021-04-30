@@ -21,7 +21,7 @@ export function SidebarNav() {
       <NavSection title="CHAT">
         <NavLink href="/chat" icon={RiDashboardLine} children="Chat" />
         <NavLink href="/intent" icon={RiDashboardLine} children="Intenções" />
-        <NavLink href="/conversas" icon={RiDashboardLine} children="Conversas" />
+        <NavLink href="/conversations" icon={RiDashboardLine} children="Conversas" />
         <NavLink href="/preview" icon={RiDashboardLine} children="Preview" />
       </NavSection>
 
