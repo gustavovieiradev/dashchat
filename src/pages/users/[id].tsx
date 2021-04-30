@@ -39,6 +39,14 @@ interface Project {
 
 interface UserCreateProps {
   clients: Client[];
+  user: User;
+}
+
+interface User {
+  name: string;
+  email: string;
+  id_client: string;
+  id_project: string;
 }
 
 const formSchema = yup.object().shape({
@@ -48,11 +56,17 @@ const formSchema = yup.object().shape({
   id_project: yup.string().required('Campo obrigatório'),
 })
 
-export default function UserCreate({clients}: UserCreateProps) {
+export default function UserDetail({clients, user}: UserCreateProps) {
   const router = useRouter();
   const toast = useToast()
   const {register, handleSubmit, formState} = useForm({
-    resolver: yupResolver(formSchema)
+    resolver: yupResolver(formSchema),
+    defaultValues: {
+      name: user.name,
+      email: user.email,
+      id_client: user.id_client,
+      id_project: user.id_project,
+    }
   });
   const [projects, setProjects] = useState<Project[]>([]);
 
@@ -121,7 +135,7 @@ export default function UserCreate({clients}: UserCreateProps) {
           </VStack>
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Link href="/client" passHref>
+              <Link href="/users" passHref>
                 <Button as="a" colorScheme="whiteAlpha">Cancelar</Button>
               </Link>
               <Button colorScheme="pink" isLoading={formState.isSubmitting} type="submit">Salvar</Button>
@@ -133,7 +147,8 @@ export default function UserCreate({clients}: UserCreateProps) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async({req}) => {
+export const getServerSideProps: GetServerSideProps = async({params, req}) => {
+  const {id} = params;
   const response: any = await fauna.query(
     q.Map(
       q.Paginate(
@@ -149,10 +164,30 @@ export const getServerSideProps: GetServerSideProps = async({req}) => {
       value: res.data.name,
     }
   });
+
+  const responseUser = await fauna.query<any>(
+    q.Get(
+      q.Match(
+        q.Index('ix_user_id'),
+        id
+      )
+    )
+  )
+
+  const user = {
+    name: responseUser.data.name,
+    email: responseUser.data.email,
+    id: responseUser.data.id,
+    id_client: responseUser.data.client.id,
+    id_project: responseUser.data.project.id
+  }
+
+  console.log(user);
   
   return {
     props: {
       clients,
+      user,
     }
   }
 }

@@ -7,6 +7,7 @@ import { GetServerSideProps } from "next";
 import { query as q } from 'faunadb';
 import { fauna } from "../../services/fauna";
 import { parseCookies } from "../../helpers";
+import { useRouter } from "next/router";
 
 interface UserListProps {
   users: User[];
@@ -20,6 +21,13 @@ interface User {
 }
 
 export default function UserList({users}: UserListProps) {
+  const router = useRouter();
+
+  function handleGoDetail(id: string) {
+    router.push(`/users/${id}`);
+    return;
+  }
+
   return (
     <Box>
       <Header />
@@ -44,7 +52,7 @@ export default function UserList({users}: UserListProps) {
             </Thead>
             <Tbody>
               {users.map(user => (
-                <Tr key={user.id}>
+                <Tr key={user.id} cursor="pointer" onClick={() =>handleGoDetail(user.id)}>
                   <Td>
                     <Box>
                       <Text fontWeight="bold">{user.name}</Text>

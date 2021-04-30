@@ -33,13 +33,12 @@ export default function Signin() {
 
       setCookie("user", JSON.stringify(user.data), {
         path: "/",
-        maxAge: 3600, // Expires after 1hr
+        maxAge: 3600,
         sameSite: true,
       })
 
       router.push('/chat')
     } catch(err) {
-      console.log('user');
       toast({
         title: "Usuário não encontrado",
         status: "error",

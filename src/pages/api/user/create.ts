@@ -15,18 +15,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       const hashPassord = await generateHash(password);
-
-      console.log(password);
-      console.log(hashPassord);
-
-
-
+      
       const body = {
         ...req.body,
         password: hashPassord,
       }
-
-      console.log(body)
 
       await fauna.query(
         q.Create(
