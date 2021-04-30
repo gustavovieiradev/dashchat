@@ -49,9 +49,9 @@ export default function IntentList({intents}: IntentProps) {
                     <Link href={`/intent/${intent.name}`} passHref>
                       <Box cursor="pointer">
                         <Text fontWeight="bold">{intent.name}</Text>
-                        <Text fontSize="sm" color="gray.300">{intent.text_input}</Text>
-                        <Text fontSize="sm" color="gray.300">{intent.text_output}</Text>
-                        <Text fontSize="sm" color="gray.300">{intent.next_intent}</Text>
+                        <Text fontSize="sm" color="gray.300">Texto de entrada: {intent.text_input}</Text>
+                        <Text fontSize="sm" color="gray.300">Texto de saída: {intent.text_output}</Text>
+                        {/* <Text fontSize="sm" color="gray.300">{intent.next_intent}</Text> */}
                       </Box>
                     </Link>
                   </Td>
