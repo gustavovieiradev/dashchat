@@ -20,6 +20,7 @@ type ChatFormData = {
 interface ChatProps {
   data: ChatFormData;
   projects: Project[];
+  url: string;
 }
 
 interface Project {
@@ -27,7 +28,7 @@ interface Project {
   value: string;
 }
 
-export default function Chat({data, projects}: ChatProps) {
+export default function Chat({data, projects, url}: ChatProps) {
   const [projectSelected, setProjectSelected] = useState('');
   const {register, handleSubmit, formState} = useForm({
     defaultValues: {
@@ -73,11 +74,11 @@ export default function Chat({data, projects}: ChatProps) {
               <VStack spacing="8">
                 <Box w="100%">
                   <Text fontWeight="medium" mb="2">Para ter o chat em qualquer página do seu site basta colar o seguinte código: </Text>
-                  <Code children={`<iframe src="http://192.168.0.210:3001/${projectSelected}" style={{position: "absolute", bottom: "10px", right: "10px", height: "800px", width: "400px"}} title="Iframe Example"></iframe>`} />
+                  <Code children={`<iframe src="${url}/${projectSelected}" style={{position: "absolute", bottom: "10px", right: "10px", height: "800px", width: "400px"}} title="Iframe Example"></iframe>`} />
                 </Box>
                 <Box w="100%">
                   <Text fontWeight="medium" mb="2">Para ter o chat completo em qualquer página do seu site basta colar o seguinte código: </Text>
-                  <Code children={`<iframe src="http://192.168.0.210:3001/chat/${projectSelected}" style={{position: "absolute", height: "100%", width: "100%"}} title="Iframe Example"></iframe>`} />
+                  <Code children={`<iframe src="${url}/chat/${projectSelected}" style={{position: "absolute", height: "100%", width: "100%"}} title="Iframe Example"></iframe>`} />
                 </Box>
                 <Box w="100%">
                   <Input name="title" label="Título" {...register('title')} />
@@ -171,7 +172,8 @@ export const getServerSideProps: GetServerSideProps = async({req}) => {
   return {
     props: {
       data: config.length ? config[config.length - 1] : {},
-      projects
+      projects,
+      url: process.env.DASHCHAT_INTERFACE
     }
   }
 }
