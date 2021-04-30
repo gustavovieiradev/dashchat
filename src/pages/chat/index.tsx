@@ -9,6 +9,7 @@ import { api } from "../../services/api";
 import { fauna } from "../../services/fauna";
 import { Select } from "../../components/Form/Select";
 import { useEffect, useState } from "react";
+import { parseCookies } from "../../helpers"
 
 type ChatFormData = {
   title: string;
@@ -115,7 +116,26 @@ export default function Chat({data, projects}: ChatProps) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async() => {
+interface CookieProps {
+  user?: string;
+}
+
+interface UserProps {
+  token: string;
+}
+
+export const getServerSideProps: GetServerSideProps = async({req}) => {
+  const data: CookieProps = parseCookies(req);
+
+  if (!data.user) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+
   const response: any = await fauna.query(
     q.Map(
       q.Paginate(

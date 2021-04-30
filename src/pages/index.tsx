@@ -5,6 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Input } from '../components/Form/Input'
 import { useRouter } from 'next/router';
 import { api } from '../services/api';
+import { useCookies } from 'react-cookie';
 
 type SignInFormData = {
   email: string;
@@ -22,6 +23,7 @@ export default function Signin() {
   const {register, handleSubmit, formState} = useForm({
     resolver: yupResolver(signInFormSchema)
   });
+  const [cookie, setCookie] = useCookies(["user"])
 
   const {errors} = formState;
 
@@ -33,6 +35,13 @@ export default function Signin() {
 
     try {
       const user = await api.post('/user/login', values);
+
+      setCookie("user", JSON.stringify(user.data), {
+        path: "/",
+        maxAge: 3600, // Expires after 1hr
+        sameSite: true,
+      })
+
       router.push('/chat')
     } catch(err) {
       console.log('user');
