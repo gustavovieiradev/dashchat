@@ -1,15 +1,25 @@
-import { Box, Button, Checkbox, Flex, Heading, Icon, Table, Tbody, Td, Text, Th, Thead, Tr, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Button, Checkbox, Flex, Heading, Icon, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
 import Link from "next/link";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
+import { GetServerSideProps } from "next";
+import { query as q } from 'faunadb';
+import { fauna } from "../../services/fauna";
+import { parseCookies } from "../../helpers";
 
-export default function UserList() {
-  const isDrawerSidebar = useBreakpointValue({
-    base: false,
-    lg: true
-  })
+interface UserListProps {
+  users: User[];
+}
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  client: string;
+}
+
+export default function UserList({users}: UserListProps) {
   return (
     <Box>
       <Header />
@@ -33,14 +43,17 @@ export default function UserList() {
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>
-                  <Box>
-                    <Text fontWeight="bold">Gustavo Vieira</Text>
-                    <Text fontSize="sm" color="gray.300">gustavovieira992@gmail.com</Text>
-                  </Box>
-                </Td>
-              </Tr>
+              {users.map(user => (
+                <Tr key={user.id}>
+                  <Td>
+                    <Box>
+                      <Text fontWeight="bold">{user.name}</Text>
+                      <Text fontSize="sm" color="gray.300">{user.email}</Text>
+                      <Text fontSize="sm" color="gray.300">Cliente: {user.client}</Text>
+                    </Box>
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
 
@@ -48,4 +61,41 @@ export default function UserList() {
       </Flex>
     </Box>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async({req}) => {
+  const data: any = parseCookies(req);
+
+  if (!data.user) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+
+  const response = await fauna.query<any>(
+    q.Map(
+      q.Paginate(
+        q.Match(q.Index('ix_user')),
+      ),
+      q.Lambda("X", q.Get(q.Var("X")))
+    )
+  )
+
+  const users = response.data.map(user => {
+    return {
+      id: user.data.id,
+      name: user.data.name,
+      email: user.data.email,
+      client: user.data.client.value,
+    }
+  })
+
+  return {
+    props: {
+      users
+    }
+  }
 }
