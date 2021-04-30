@@ -6,9 +6,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     try {
       await fauna.query(
-        q.Create(
-          q.Collection('config'),
-          { data: req.body }
+        q.Update(
+          q.Select("ref",
+            q.Get(
+              q.Match(q.Index("ix_config_id_project"), req.body.id_project)
+            )
+          ),
+          {
+            data: req.body
+          }
         )
       )
 

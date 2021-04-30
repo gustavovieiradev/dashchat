@@ -40,10 +40,6 @@ export default function Chat({data, projects, url}: ChatProps) {
   const toast = useToast();
 
   const handleSave: SubmitHandler<ChatFormData> = async (values) => {
-    if (data.theme) {
-      values.oldTheme = data.theme;
-    }
-
     await api.post('/config/create', values);
 
     toast({
@@ -106,7 +102,7 @@ export default function Chat({data, projects, url}: ChatProps) {
               </VStack>
               <Flex mt="8" justify="flex-end">
                 <HStack spacing="4">
-                  {/* <Button colorScheme="pink" type="submit">Salvar</Button> */}
+                  <Button colorScheme="pink" type="submit">Editar</Button>
                 </HStack>
               </Flex>
             </Box>  
