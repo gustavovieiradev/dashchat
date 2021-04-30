@@ -43,7 +43,6 @@ export default function Project({projects}: ProjectProps) {
             <Thead>
               <Tr>
                 <Th>Projeto</Th>
-                <Th>Cliente</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -53,13 +52,7 @@ export default function Project({projects}: ProjectProps) {
                     <Link href={`/projects/${project.id}`} passHref>
                       <Box cursor="pointer">
                         <Text fontWeight="bold">{project.name}</Text>
-                      </Box>
-                    </Link>
-                  </Td>
-                  <Td>
-                    <Link href={`/projects/${project.id}`} passHref>
-                      <Box cursor="pointer">
-                        <Text fontWeight="bold">{project.client.value}</Text>
+                        <Text fontSize="sm" color="gray.300">Cliente: {project.client.value}</Text>
                       </Box>
                     </Link>
                   </Td>
