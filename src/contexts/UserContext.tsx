@@ -1,28 +1,40 @@
 import { useDisclosure, UseDisclosureReturn } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useEffect } from "react";
+import { useCookies } from "react-cookie";
+import { parseCookies } from "../helpers";
 
-interface SidebarDrawerProviderProps {
+interface UserProviderProps {
   children: ReactNode;
 }
 
-type SidebarDrawerContextData = UseDisclosureReturn;
+interface UserContextData {
+  user: User;
+};
 
-const SidebarDrawerContext = createContext({} as SidebarDrawerContextData);
+interface User {
+  name?: string;
+  email?: string;
+}
 
-export function SidebarDrawerProvider({children}: SidebarDrawerProviderProps) {
-  const disclosure = useDisclosure();
-  const router = useRouter();
+const UserContext = createContext({} as UserContextData);
 
-  useEffect(() => {
-    disclosure.onClose();
-  }, [router.asPath])
+export function UserProvider({children}: UserProviderProps) {
+  const [cookie] = useCookies(["user"])
+
+  let user = {};
+  if (cookie?.user?.user) {
+    user = {
+      name: cookie.user.user.data.name,
+      email: cookie.user.user.data.email,
+    }
+  }
 
   return (
-    <SidebarDrawerContext.Provider value={disclosure}>
+    <UserContext.Provider value={{user}}>
       {children}
-    </SidebarDrawerContext.Provider>
+    </UserContext.Provider>
   )
 }
 
-export const useSidebarDrawer = () => useContext(SidebarDrawerContext);
+export const useUser = () => useContext(UserContext);

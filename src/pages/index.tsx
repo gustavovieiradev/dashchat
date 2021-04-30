@@ -23,16 +23,11 @@ export default function Signin() {
   const {register, handleSubmit, formState} = useForm({
     resolver: yupResolver(signInFormSchema)
   });
-  const [cookie, setCookie] = useCookies(["user"])
+  const [_, setCookie] = useCookies(["user"])
 
   const {errors} = formState;
 
   const handleSignin: SubmitHandler<SignInFormData> = async (values) => {
-    // if (values.email === 'admin@gmail.com' && values.password === '@bcd!23A') {
-    //   router.push('/chat')
-    //   return;
-    // }
-
     try {
       const user = await api.post('/user/login', values);
 
