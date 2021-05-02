@@ -1,20 +1,17 @@
-import { Button, Flex, Stack, useToast, Link } from '@chakra-ui/react'
+import { Button, Flex, Stack, useToast, Link, Icon } from '@chakra-ui/react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Input } from '../components/Form/Input'
 import { useRouter } from 'next/router';
 import { api } from '../services/api';
-import { useCookies } from 'react-cookie';
 
-type SignInFormData = {
+type ResetPasswordFormData = {
   email: string;
-  password: string;
 }
 
 const signInFormSchema = yup.object().shape({
   email: yup.string().required().email(),
-  password: yup.string().required(),
 })
 
 export default function Signin() {
@@ -23,21 +20,19 @@ export default function Signin() {
   const {register, handleSubmit, formState} = useForm({
     resolver: yupResolver(signInFormSchema)
   });
-  const [_, setCookie] = useCookies(["user"])
 
   const {errors} = formState;
 
-  const handleSignin: SubmitHandler<SignInFormData> = async (values) => {
+  const handleSignin: SubmitHandler<ResetPasswordFormData> = async (values) => {
     try {
-      const user = await api.post('/user/login', values);
-
-      setCookie("user", JSON.stringify(user.data), {
-        path: "/",
-        maxAge: 3600,
-        sameSite: true,
+      await api.post('/user/resetPassword', values);
+      toast({
+        title: "Senha alterada com sucesso. Verifique seu e-mail",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
       })
-
-      router.push('/chat')
+      handlePageLogin();
     } catch(err) {
       toast({
         title: "Usuário não encontrado",
@@ -48,9 +43,8 @@ export default function Signin() {
     }
   } 
 
-  function handlePageResetPassword(ev) {
-    ev.preventDefault();
-    router.push('/resetPassword')
+  function handlePageLogin() {
+    router.push('/')
   }
 
   return (
@@ -64,17 +58,10 @@ export default function Signin() {
             type="email" 
             {...register('email')} 
           />
-          <Input 
-            name="password" 
-            label="Senha" 
-            type="password" 
-            error={errors.password} 
-            {...register('password')} />
         </Stack>
-        <Button type="submit" mt="6" colorScheme="pink" size="lg" isLoading={formState.isSubmitting} >Entrar</Button>
-        <Button type="submit" mt="6" colorScheme="whiteAlpha" onClick={handlePageResetPassword}>Esqueceu a senha?</Button>
+        <Button type="submit" mt="6" colorScheme="pink" size="lg" isLoading={formState.isSubmitting} >Reenviar senha</Button>
+        <Button type="submit" mt="6" colorScheme="whiteAlpha" onClick={handlePageLogin} >Voltar ao login</Button>
       </Flex>
-
     </Flex>
   )
 }
