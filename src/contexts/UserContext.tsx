@@ -1,8 +1,5 @@
-import { useDisclosure, UseDisclosureReturn } from "@chakra-ui/react";
-import { useRouter } from "next/router";
-import { createContext, ReactNode, useContext, useEffect } from "react";
+import { createContext, ReactNode, useContext } from "react";
 import { useCookies } from "react-cookie";
-import { parseCookies } from "../helpers";
 
 interface UserProviderProps {
   children: ReactNode;

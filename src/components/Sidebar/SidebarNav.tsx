@@ -33,7 +33,7 @@ export function SidebarNav() {
       </NavSection>
 
       <NavSection title="">
-        <NavLink href="/projects" icon={RiEditLine} children="Editar dados" />
+        <NavLink href="/profile" icon={RiEditLine} children="Editar perfil" />
         <Link as="button" display="flex" alignItems="center" onClick={logout}>
           <Icon as={RiLogoutBoxLine} fontSize="20" />
           <Text ml="4" fontWeight="medium">Sair</Text>

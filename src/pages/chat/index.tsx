@@ -10,6 +10,7 @@ import { fauna } from "../../services/fauna";
 import { Select } from "../../components/Form/Select";
 import { useEffect, useState } from "react";
 import { parseCookies } from "../../helpers"
+import { ModalFirstAccess } from "../../components/ModalFirstAccess";
 
 type ChatFormData = {
   title: string;
@@ -109,16 +110,13 @@ export default function Chat({data, projects, url}: ChatProps) {
           )}
         </Box>
       </Flex>
+      {/* <ModalFirstAccess /> */}
     </Box>
   )
 }
 
 interface CookieProps {
   user?: string;
-}
-
-interface UserProps {
-  token: string;
 }
 
 export const getServerSideProps: GetServerSideProps = async({req}) => {

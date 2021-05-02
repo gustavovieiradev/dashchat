@@ -1,8 +1,6 @@
 import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, useToast, VStack } from "@chakra-ui/react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { v4 } from "uuid";
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Input } from "../../components/Form/Input";
@@ -54,7 +52,6 @@ export default function ClientEdit({data}: ClientEditProps) {
       isClosable: true,
     })
     router.push('/clients');
-
   } 
 
   return (
