@@ -23,6 +23,9 @@ export function ActiveLink({children, exact = false, ...rest}: ActiveLinkProps) 
   return (
     <Link {...rest}>
       {cloneElement(children, {
+        _hover: {
+          color: isActive ? 'pink.400' : 'whiteAlpha.700'
+        },
         color: isActive ? 'pink.400' : 'gray.50'
       })}
     </Link>

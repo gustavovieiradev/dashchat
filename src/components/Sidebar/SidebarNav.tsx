@@ -1,5 +1,5 @@
 import { Stack } from "@chakra-ui/react";
-import { RiChatSmile3Fill, RiChatSmile3Line, RiContactsBook2Line, RiContactsLine, RiDashboardLine, RiGitMergeLine, RiInputMethodLine, RiLogoutBoxLine, RiUserSmileLine, RiWechatLine } from "react-icons/ri";
+import { RiChatSmile3Fill, RiChatSmile3Line, RiContactsBook2Line, RiContactsLine, RiDashboardLine, RiEditLine, RiGitMergeLine, RiInputMethodLine, RiLogoutBoxLine, RiUserSmileLine, RiWechatLine } from "react-icons/ri";
 import { AiOutlineFundProjectionScreen } from "react-icons/ai";
 import { NavLink } from "./NavLink";
 import { NavSection } from "./NavSection";
@@ -32,10 +32,13 @@ export function SidebarNav() {
         <NavLink href="/projects" icon={AiOutlineFundProjectionScreen} children="Projetos" />
       </NavSection>
 
-      <Link as="button" display="flex" alignItems="center" onClick={logout}>
-        <Icon as={RiLogoutBoxLine} fontSize="20" />
-        <Text ml="4" fontWeight="medium">Sair</Text>
-      </Link>
+      <NavSection title="">
+        <NavLink href="/projects" icon={RiEditLine} children="Editar dados" />
+        <Link as="button" display="flex" alignItems="center" onClick={logout}>
+          <Icon as={RiLogoutBoxLine} fontSize="20" />
+          <Text ml="4" fontWeight="medium">Sair</Text>
+        </Link>
+      </NavSection>
     </Stack>
   )
 }
