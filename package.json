@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@badrap/bar-of-progress": "^0.1.2",
     "@chakra-ui/react": "^1.5.2",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
@@ -28,6 +29,7 @@
     "react-hook-form": "^7.2.1",
     "react-icons": "^4.2.0",
     "react-iframe": "^1.8.0",
+    "sass": "^1.32.12",
     "uuidv4": "^6.2.7",
     "yup": "^0.32.9"
   },
