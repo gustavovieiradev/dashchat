@@ -6,7 +6,18 @@ import { generateHash } from "../_lib/password";
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     try {
-      const password = await generateHash(req.body.password);
+
+      const data: any = {
+        name: req.body.name,
+      }
+
+      
+      if (req.body.password) {
+        data.password = await generateHash(req.body.password);
+      }
+
+      console.log(data)
+
       await fauna.query(
         q.Update(
           q.Select("ref",
@@ -15,16 +26,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             )
           ),
           {
-            data: {
-              name: req.body.name,
-              password
-            },
+            data
           }
         )
       )
       return res.json({success: true});
     } catch (err) {
-      return res.status(500).json({err})
+      console.log('err', err);
+      return res.status(500).json(err);
     }
   }
 }
