@@ -1,6 +1,7 @@
 import { Stack } from "@chakra-ui/react";
 import { RiChatSmile3Fill, RiChatSmile3Line, RiContactsBook2Line, RiContactsLine, RiDashboardLine, RiEditLine, RiGitMergeLine, RiInputMethodLine, RiLogoutBoxLine, RiUserSmileLine, RiWechatLine } from "react-icons/ri";
 import { AiOutlineFundProjectionScreen } from "react-icons/ai";
+import { SiSwagger } from "react-icons/si";
 import { NavLink } from "./NavLink";
 import { NavSection } from "./NavSection";
 import { Icon, Link, Text, LinkProps } from "@chakra-ui/react";
@@ -24,6 +25,7 @@ export function SidebarNav() {
         <NavLink href="/intent" icon={RiDashboardLine} children="Intenções" />
         <NavLink href="/conversations" icon={RiWechatLine} children="Conversas" />
         <NavLink href="/preview" icon={RiChatSmile3Fill} children="Preview" />
+        <NavLink href="/endpoint" icon={SiSwagger} children="API" />
       </NavSection>
 
       <NavSection title="ADMIN">
