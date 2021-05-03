@@ -6,6 +6,7 @@ import { Input } from '../components/Form/Input'
 import { useRouter } from 'next/router';
 import { api } from '../services/api';
 import { useCookies } from 'react-cookie';
+import { useUser } from '../contexts/UserContext';
 
 type SignInFormData = {
   email: string;
@@ -18,6 +19,7 @@ const signInFormSchema = yup.object().shape({
 })
 
 export default function Signin() {
+  const { createUser } = useUser()
   const router = useRouter();
   const toast = useToast()
   const {register, handleSubmit, formState} = useForm({
@@ -30,13 +32,7 @@ export default function Signin() {
   const handleSignin: SubmitHandler<SignInFormData> = async (values) => {
     try {
       const user = await api.post('/user/login', values);
-
-      setCookie("user", JSON.stringify(user.data), {
-        path: "/",
-        maxAge: 3600,
-        sameSite: true,
-      })
-
+      createUser(user.data);
       router.push('/chat')
     } catch(err) {
       toast({
