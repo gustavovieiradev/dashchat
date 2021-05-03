@@ -12,7 +12,8 @@ export function SidebarNav() {
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const router = useRouter();
 
-  function logout() {
+  function logout(ev) {
+    ev.preventDefault();
     removeCookie('user');
     removeCookie('token');
     router.push('/');
