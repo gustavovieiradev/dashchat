@@ -70,7 +70,7 @@ export default function Preview({ projects }: PreviewProps) {
               <Flex w="100%" bgColor="gray.900" h="80px" borderTopRadius="10" align="center" px="5">
                 <Heading size="lg" fontWeight="normal">Bem vindo</Heading>
               </Flex>
-              <Box borderLeftWidth="3px" borderRightWidth="3px" borderColor="gray.900" p="5" height="500" w="100%">
+              <Box borderLeftWidth="3px" borderRightWidth="3px" borderColor="gray.900" p="5" height="500" w="100%" overflowY="scroll">
                 <VStack spacing="3" w="100%">
                   {messages.map((mess, key) => (
                     <Flex justify={mess.sender === 'user' ? 'flex-end' : 'flex-start'} w="100%" key={key + 1} direction="row">
@@ -80,7 +80,6 @@ export default function Preview({ projects }: PreviewProps) {
                 </VStack>
               </Box>
               <Flex h="80px" bgColor="gray.900" borderBottomRadius="10" align="center" px="5">
-                {/* <Input name="dfsa"/> */}
                 <InputGroup>
                   <Input
                     name="search"
