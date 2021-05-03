@@ -42,6 +42,7 @@ export default function Preview({ projects }: PreviewProps) {
           message: result.data.text_output,
           sender: 'bot'
         }])
+
         setMessage('');
       }
 
@@ -98,6 +99,7 @@ export default function Preview({ projects }: PreviewProps) {
                     onKeyDown={handleSendMessage} 
                     placeholder="Digite aqui...."
                     onChange={(ev) => setMessage(ev.target.value)}
+                    value={message}
                   />
                   <InputRightElement children={<Icon as={RiSendPlaneFill} color="pink.500" w="7" h="7" mt="2"/>} />
                 </InputGroup>
