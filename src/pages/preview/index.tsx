@@ -42,6 +42,7 @@ export default function Preview({ projects }: PreviewProps) {
           message: result.data.text_output,
           sender: 'bot'
         }])
+        setMessage('');
       }
 
     } catch (err) {
