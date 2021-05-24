@@ -14,12 +14,11 @@ import { query as q } from 'faunadb';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from "react";
+import { apiNest } from "../../services/api-nest";
 
 type ProjectsFormData = {
-  id: string;
-  name: string;
-  id_client: string;
-  client?: Client;
+  nome: string;
+  cliente: string;
 }
 
 interface Client {
@@ -32,8 +31,8 @@ interface ProjectCreateProps {
 }
 
 const formSchema = yup.object().shape({
-  name: yup.string().required('Campo obrigatório'),
-  id_client: yup.string().required('Campo obrigatório'),
+  nome: yup.string().required('Campo obrigatório'),
+  cliente: yup.string().required('Campo obrigatório'),
 })
 
 export default function ProjectCreate({clients}: ProjectCreateProps) {
@@ -46,24 +45,20 @@ export default function ProjectCreate({clients}: ProjectCreateProps) {
   const {errors} = formState;
 
   const handleSave: SubmitHandler<ProjectsFormData> = async (values) => {
-    values.id = v4();
-    const client = clients.find(c => values.id_client === c.id);
-    values.client = client;
+    await api.post('/project', values);
 
-    await api.post('/project/create', values);
+    // const bodyConfig = {
+    //   title: 'Bem vindo',
+    //   theme: 'black',
+    //   id_project: values.id,
+    //   project: {
+    //     id: values.id,
+    //     name: values.name,
+    //     client: values.client
+    //   }
+    // }
 
-    const bodyConfig = {
-      title: 'Bem vindo',
-      theme: 'black',
-      id_project: values.id,
-      project: {
-        id: values.id,
-        name: values.name,
-        client: values.client
-      }
-    }
-
-    await api.post('/config/create', bodyConfig);
+    // await api.post('/config/create', bodyConfig);
 
     toast({
       title: "Projeto salvo com sucesso",
@@ -71,7 +66,7 @@ export default function ProjectCreate({clients}: ProjectCreateProps) {
       duration: 9000,
       isClosable: true,
     })
-    router.push('/projects');
+    // router.push('/projects');
   } 
 
   return (
@@ -84,10 +79,10 @@ export default function ProjectCreate({clients}: ProjectCreateProps) {
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
-              <Input name="name" label="Nome do cliente" {...register('name')} error={errors.name}/>
+              <Input name="nome" label="Nome do cliente" {...register('nome')} error={errors.nome}/>
             </Box>
             <Box w="100%">
-            <Select name="client" placeholder="Selecione" label="Cliente" {...register('id_client')} options={clients} error={errors.id_client}/>
+            <Select name="cliente" placeholder="Selecione" label="Cliente" {...register('cliente')} options={clients} error={errors.cliente}/>
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
@@ -105,19 +100,12 @@ export default function ProjectCreate({clients}: ProjectCreateProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async() => {
-  const response: any = await fauna.query(
-    q.Map(
-      q.Paginate(
-        q.Match(q.Index('ix_client')),
-      ),
-      q.Lambda("X", q.Get(q.Var("X")))
-    )
-  )
+  const response = await apiNest.get('/cliente')
 
   const clients = response.data.map(res => {
     return {
-      id: res.data.id,
-      value: res.data.name,
+      id: res._id,
+      value: res.nome,
     }
   });
   
