@@ -14,17 +14,14 @@ import { query as q } from 'faunadb';
 import { useState } from "react";
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { apiNest } from "../../services/api-nest";
 
 type UserFormData = {
-  id: string;
   name: string;
   email: string;
-  id_client: string;
-  id_project: string;
-  client?: Client;
   password?: string;
-  project?: Project;
-  profile?: string;
+  cliente: string;
+  projeto: string;
 }
 
 interface Client {
@@ -44,8 +41,9 @@ interface UserCreateProps {
 const formSchema = yup.object().shape({
   name: yup.string().required('Campo obrigatório'),
   email: yup.string().required('Campo obrigatório'),
-  id_client: yup.string().required('Campo obrigatório'),
-  id_project: yup.string().required('Campo obrigatório'),
+  password: yup.string().required('Campo obrigatório'),
+  projeto: yup.string().required('Campo obrigatório'),
+  cliente: yup.string().required('Campo obrigatório'),
 })
 
 export default function UserCreate({clients}: UserCreateProps) {
@@ -59,42 +57,27 @@ export default function UserCreate({clients}: UserCreateProps) {
   const {errors} = formState;
 
   const handleSave: SubmitHandler<UserFormData> = async (values) => {
-    values.id = v4();
-    const client = clients.find(c => values.id_client === c.id);
-    values.client = client;
-
-    const project = projects.find(p => values.id_project === p.id);
-    values.project = project;
-    values.profile = 'user';
-
-    await api.post('/user/create', values);
-
+    await apiNest.post('users', values);
     toast({
       title: "Usuário salvo com sucesso",
       status: "success",
       duration: 9000,
       isClosable: true,
     })
-
-    router.push('/users');
   } 
 
   async function handleChangeClient(idClient: string) {
     if (!idClient) {
       return;
     }
-
-    const projectsResponse = await api.get(`/project/clientId`, {params: {id: idClient}});
-
-    const formatProject = projectsResponse.data.data.map(project => {
+    const projectsResponse = await apiNest.get(`projeto/cliente/${idClient}`);
+    const formatProject = projectsResponse.data.map(project => {
       return {
-        id: project.data.id,
-        value: project.data.name
+        id: project._id,
+        value: project.nome
       }
     }) 
-
     setProjects(formatProject);
-    
   }
 
   return (
@@ -113,10 +96,13 @@ export default function UserCreate({clients}: UserCreateProps) {
               <Input name="name" label="E-mail" {...register('email')} error={errors.email} />
             </Box>
             <Box w="100%">
-              <Select placeholder="Selecione" name="client" label="Cliente" {...register('id_client')} options={clients} onChange={(ev) => handleChangeClient(ev.target.value)} error={errors.id_client}/>
+              <Input name="password" label="Senha" {...register('password')} error={errors.password} type="password" />
             </Box>
             <Box w="100%">
-              <Select placeholder="Selecione" name="project" label="Projetos" {...register('id_project')} options={projects} error={errors.id_project}/>
+              <Select placeholder="Selecione" name="cliente" label="Cliente" {...register('cliente')} options={clients} onChange={(ev) => handleChangeClient(ev.target.value)} error={errors.cliente}/>
+            </Box>
+            <Box w="100%">
+              <Select placeholder="Selecione" name="projeto" label="Projetos" {...register('projeto')} options={projects} error={errors.projeto}/>
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
@@ -134,25 +120,18 @@ export default function UserCreate({clients}: UserCreateProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async({req}) => {
-  const response: any = await fauna.query(
-    q.Map(
-      q.Paginate(
-        q.Match(q.Index('ix_client')),
-      ),
-      q.Lambda("X", q.Get(q.Var("X")))
-    )
-  )
+  const response = await apiNest.get('/cliente');
 
   const clients = response.data.map(res => {
     return {
-      id: res.data.id,
-      value: res.data.name,
+      id: res._id,
+      value: res.nome,
     }
   });
   
   return {
     props: {
-      clients,
+      clients
     }
   }
 }
