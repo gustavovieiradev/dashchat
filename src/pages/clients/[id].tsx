@@ -39,8 +39,7 @@ export default function ClientEdit({nome, _id}: ClientEditProps) {
   const {errors} = formState;
 
   const handleSave: SubmitHandler<ClientFormData> = async (values) => {
-    const id = router.query.id;
-    await api.patch(`/client/${id}`, values);
+    await api.patch(`/client/${_id}`, values);
     toast({
       title: "Cliente atualizado com sucesso",
       status: "success",
