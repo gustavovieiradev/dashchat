@@ -1,8 +1,6 @@
 import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, useToast, VStack } from "@chakra-ui/react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { v4 } from "uuid";
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Input } from "../../components/Form/Input";
@@ -11,12 +9,11 @@ import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
 
 type ClientFormData = {
-  name: string;
-  id: string;
+  nome: string;
 }
 
 const formSchema = yup.object().shape({
-  name: yup.string().required('Campo obrigatório'),
+  nome: yup.string().required('Campo obrigatório'),
 })
 
 export default function ClientCreate() {
@@ -29,17 +26,15 @@ export default function ClientCreate() {
   const {errors} = formState;
 
   const handleSave: SubmitHandler<ClientFormData> = async (values) => {
-    values.id = v4();
     await api.post('/client/create', values);
     toast({
-      title: "Intenção salva com sucesso",
+      title: "Cliente salv com sucesso",
       status: "success",
       duration: 9000,
       isClosable: true,
     })
     router.push('/clients');
-
-  } 
+  }
 
   return (
     <Box>
@@ -51,7 +46,7 @@ export default function ClientCreate() {
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
-              <Input name="name" label="Nome do cliente" {...register('name')} error={errors.name} />
+              <Input name="name" label="Nome do cliente" {...register('nome')} error={errors.nome} />
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">

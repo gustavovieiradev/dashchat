@@ -8,34 +8,30 @@ import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
 import { GetServerSideProps } from "next";
-import { query as q } from 'faunadb';
-import { fauna } from "../../services/fauna";
 import { Alert } from "../../components/Alert";
 import { useState } from "react";
+import { apiNest } from "../../services/api-nest";
 
 type ClientFormData = {
-  name: string;
-  id: string;
+  nome: string;
 }
 
 interface ClientEditProps {
-  data: {
-    name: string;
-    id: string;
-  }
+  nome: string;
+  _id: string;
 }
 
 const formSchema = yup.object().shape({
-  name: yup.string().required('Campo obrigatório'),
+  nome: yup.string().required('Campo obrigatório'),
 })
 
-export default function ClientEdit({data}: ClientEditProps) {
+export default function ClientEdit({nome, _id}: ClientEditProps) {
   const router = useRouter();
   const toast = useToast()
   const {register, handleSubmit, formState} = useForm({
     resolver: yupResolver(formSchema),
     defaultValues: {
-      name: data.name
+      nome: nome
     }
   });
   const [isOpenAlert, setIsOpenAlert] = useState(false);
@@ -43,16 +39,16 @@ export default function ClientEdit({data}: ClientEditProps) {
   const {errors} = formState;
 
   const handleSave: SubmitHandler<ClientFormData> = async (values) => {
-    values.id = String(router.query.id);
-    await api.post('/client/update', values);
+    const id = router.query.id;
+    await api.patch(`/client/${id}`, values);
     toast({
-      title: "Intenção atualizada com sucesso",
+      title: "Cliente atualizado com sucesso",
       status: "success",
       duration: 9000,
       isClosable: true,
     })
     router.push('/clients');
-  } 
+  }
 
   return (
     <Box>
@@ -64,7 +60,7 @@ export default function ClientEdit({data}: ClientEditProps) {
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
-              <Input name="name" label="Nome do cliente" {...register('name')} error={errors.name} />
+              <Input name="name" label="Nome do cliente" {...register('nome')} error={errors.nome} />
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
@@ -77,7 +73,7 @@ export default function ClientEdit({data}: ClientEditProps) {
         </Box>
       </Flex>
 
-      {isOpenAlert && <Alert closeAlert={() => setIsOpenAlert(false)} description={`Deseja realmente excluir o cliente ${data.name}`} title="Excluir cliente" />}
+      {isOpenAlert && <Alert closeAlert={() => setIsOpenAlert(false)} description={`Deseja realmente excluir o cliente ${nome}`} title="Excluir cliente" />}
 
     </Box>
   )
@@ -85,19 +81,10 @@ export default function ClientEdit({data}: ClientEditProps) {
 
 export const getServerSideProps: GetServerSideProps = async({params}) => {
   const { id } = params;
-  console.log(id)
-  const response: any = await fauna.query(
-    q.Get(
-      q.Match(
-        q.Index('ix_client_id'),
-        id
-      )
-    )
-  )
-  
+  const response = await apiNest.get(`cliente/${id}`);
   return {
     props: {
-      data: response.data
+      ...response.data
     }
   }
 }

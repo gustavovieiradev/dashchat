@@ -1,5 +1,5 @@
 import { Box, Button, Code, Divider, Flex, Heading, HStack, Radio, RadioGroup, Text, useToast, VStack } from "@chakra-ui/react";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import { query as q } from 'faunadb';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Input } from "../../components/Form/Input";
@@ -10,7 +10,7 @@ import { fauna } from "../../services/fauna";
 import { Select } from "../../components/Form/Select";
 import { useEffect, useState } from "react";
 import { parseCookies } from "../../helpers"
-import { ModalFirstAccess } from "../../components/ModalFirstAccess";
+// import { ModalFirstAccess } from "../../components/ModalFirstAccess";
 
 type ChatFormData = {
   title: string;

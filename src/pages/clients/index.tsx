@@ -6,10 +6,11 @@ import { RiAddLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { fauna } from "../../services/fauna";
+import { apiNest } from '../../services/api-nest';
 
 interface Client {
-  name: string;
-  id: string;
+  nome: string;
+  _id: string;
 }
 
 interface CLientProps {
@@ -41,11 +42,11 @@ export default function Clients({clients}: CLientProps) {
             </Thead>
             <Tbody>
               {clients.map(client => (
-                <Tr key={client.name}>
+                <Tr key={client._id}>
                   <Td>
-                    <Link href={`/clients/${client.id}`} passHref>
+                    <Link href={`/clients/${client._id}`} passHref>
                       <Box cursor="pointer">
-                        <Text fontWeight="bold">{client.name}</Text>
+                        <Text fontWeight="bold">{client.nome}</Text>
                       </Box>
                     </Link>
                   </Td>
@@ -61,25 +62,10 @@ export default function Clients({clients}: CLientProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async() => {
-  const response: any = await fauna.query(
-    q.Map(
-      q.Paginate(
-        q.Match(q.Index('ix_client')),
-      ),
-      q.Lambda("X", q.Get(q.Var("X")))
-    )
-  )
-
-  const clients = response.data.map(res => {
-    return {
-      name: res.data.name,
-      id: res.data.id,
-    }
-  });
-  
+  const clients = await apiNest.get('/cliente');
   return {
     props: {
-      clients
+      clients: clients.data
     }
   }
 }
