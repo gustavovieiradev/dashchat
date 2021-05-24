@@ -8,16 +8,13 @@ import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
 import { Select } from "../../components/Form/Select";
 import { GetServerSideProps } from "next";
-import { fauna } from "../../services/fauna";
-import { query as q } from 'faunadb';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { apiNest } from "../../services/api-nest";
 
 type ProjectsFormData = {
-  id: string;
-  name: string;
-  id_client: string;
-  client?: Client;
+  nome: string;
+  cliente: string;
 }
 
 interface Client {
@@ -28,14 +25,15 @@ interface Client {
 interface ProjectEditProps {
   clients: Client[];
   project: {
-    name: string;
-    id_client: string;
+    _id: string;
+    nome: string;
+    cliente: string;
   }
 }
 
 const formSchema = yup.object().shape({
-  name: yup.string().required('Campo obrigatório'),
-  id_client: yup.string().required('Campo obrigatório'),
+  nome: yup.string().required('Campo obrigatório'),
+  cliente: yup.string().required('Campo obrigatório'),
 })
 
 export default function ProjectEdit({clients, project}: ProjectEditProps) {
@@ -44,21 +42,17 @@ export default function ProjectEdit({clients, project}: ProjectEditProps) {
   const {register, handleSubmit, formState} = useForm({
     resolver: yupResolver(formSchema),
     defaultValues: {
-      name: project.name,
-      id_client: project.id_client,
+      nome: project.nome,
+      cliente: project.cliente,
     }
   });
 
   const {errors} = formState;
 
   const handleSave: SubmitHandler<ProjectsFormData> = async (values) => {
-    values.id = String(router.query.id);
-    const client = clients.find(c => values.id_client === c.id);
-    values.client = client;
-
-    await api.post('/project/update', values);
+    await api.patch(`/project/${project._id}`, values);
     toast({
-      title: "Projeto salvo com sucesso",
+      title: "Projeto editado com sucesso",
       status: "success",
       duration: 9000,
       isClosable: true,
@@ -76,15 +70,15 @@ export default function ProjectEdit({clients, project}: ProjectEditProps) {
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
-              <Input name="name" label="Nome do cliente" {...register('name')} error={errors.name}/>
+              <Input name="nome" label="Nome do cliente" {...register('nome')} error={errors.nome}/>
             </Box>
             <Box w="100%">
-              <Select name="client" placeholder="Selecione" label="Cliente" {...register('id_client')} options={clients} error={errors.id_client}/>
+              <Select name="cliente" placeholder="Selecione" label="Cliente" {...register('cliente')} options={clients} error={errors.cliente}/>
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Link href="/client" passHref>
+              <Link href="/projects" passHref>
                 <Button as="a" colorScheme="whiteAlpha">Cancelar</Button>
               </Link>
               <Button colorScheme="pink" isLoading={formState.isSubmitting} type="submit">Salvar</Button>
@@ -97,36 +91,23 @@ export default function ProjectEdit({clients, project}: ProjectEditProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async({params}) => {
-  const response: any = await fauna.query(
-    q.Map(
-      q.Paginate(
-        q.Match(q.Index('ix_client')),
-      ),
-      q.Lambda("X", q.Get(q.Var("X")))
-    )
-  )
+  const clienteResponse = await apiNest.get('/cliente')
 
-  const clients = response.data.map(res => {
+  const clients = clienteResponse.data.map(res => {
     return {
-      id: res.data.id,
-      value: res.data.name,
+      id: res._id,
+      value: res.nome,
     }
   });
 
   const { id } = params;
-  const responseProject: any = await fauna.query(
-    q.Get(
-      q.Match(
-        q.Index('ix_project_id'),
-        id
-      )
-    )
-  )
-  
+
+  const projetoResponse = await apiNest.get(`projeto/${id}`);
+
   return {
     props: {
       clients,
-      project: responseProject.data
+      project: projetoResponse.data
     }
   }
 }

@@ -28,7 +28,7 @@ export default function ClientCreate() {
   const handleSave: SubmitHandler<ClientFormData> = async (values) => {
     await api.post('/client/create', values);
     toast({
-      title: "Cliente salv com sucesso",
+      title: "Cliente salvo com sucesso",
       status: "success",
       duration: 9000,
       isClosable: true,
@@ -46,7 +46,7 @@ export default function ClientCreate() {
           <Divider my="6" borderColor="gray.700" />
           <VStack spacing="8">
             <Box w="100%">
-              <Input name="name" label="Nome do cliente" {...register('nome')} error={errors.nome} />
+              <Input name="nome" label="Nome do cliente" {...register('nome')} error={errors.nome} />
             </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
