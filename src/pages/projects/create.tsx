@@ -87,7 +87,7 @@ export default function ProjectCreate({clients}: ProjectCreateProps) {
           </VStack>
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Link href="/client" passHref>
+              <Link href="/projects" passHref>
                 <Button as="a" colorScheme="whiteAlpha">Cancelar</Button>
               </Link>
               <Button colorScheme="pink" isLoading={formState.isSubmitting} type="submit">Salvar</Button>
