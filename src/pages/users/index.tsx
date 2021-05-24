@@ -4,10 +4,9 @@ import { RiAddLine, RiPencilLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { GetServerSideProps } from "next";
-import { query as q } from 'faunadb';
-import { fauna } from "../../services/fauna";
 import { parseCookies } from "../../helpers";
 import { useRouter } from "next/router";
+import { apiNest } from "../../services/api-nest";
 
 interface UserListProps {
   users: User[];
@@ -17,7 +16,8 @@ interface User {
   id: string;
   name: string;
   email: string;
-  client: string;
+  cliente: string;
+  projeto: string;
 }
 
 export default function UserList({users}: UserListProps) {
@@ -57,7 +57,7 @@ export default function UserList({users}: UserListProps) {
                     <Box>
                       <Text fontWeight="bold">{user.name}</Text>
                       <Text fontSize="sm" color="gray.300">{user.email}</Text>
-                      <Text fontSize="sm" color="gray.300">Cliente: {user.client}</Text>
+                      <Text fontSize="sm" color="gray.300">Cliente: {user.cliente}</Text>
                     </Box>
                   </Td>
                 </Tr>
@@ -83,23 +83,19 @@ export const getServerSideProps: GetServerSideProps = async({req}) => {
     }
   }
 
-  const response = await fauna.query<any>(
-    q.Map(
-      q.Paginate(
-        q.Match(q.Index('ix_user')),
-      ),
-      q.Lambda("X", q.Get(q.Var("X")))
-    )
-  )
+  const response = await apiNest.get('users');
 
   const users = response.data.map(user => {
     return {
-      id: user.data.id,
-      name: user.data.name,
-      email: user.data.email,
-      client: user.data.client.value,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      client: user.cliente || null,
+      project: user.projeto || null,
     }
   })
+  
+  console.log(users);
 
   return {
     props: {
