@@ -66,7 +66,7 @@ export default function ProjectCreate({clients}: ProjectCreateProps) {
       duration: 9000,
       isClosable: true,
     })
-    // router.push('/projects');
+    router.push('/projects');
   } 
 
   return (

@@ -6,16 +6,17 @@ import { RiAddLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { fauna } from "../../services/fauna";
+import { apiNest } from '../../services/api-nest';
 
 interface Project {
-  id: string;
-  name: string;
-  client: Client;
+  _id: string;
+  nome: string;
+  cliente: Client;
 }
 
 interface Client {
-  id: string;
-  value: string;
+  _id: string;
+  nome: string;
 }
 
 interface ProjectProps {
@@ -47,12 +48,12 @@ export default function Project({projects}: ProjectProps) {
             </Thead>
             <Tbody>
               {projects.map(project => (
-                <Tr key={project.id}>
+                <Tr key={project._id}>
                   <Td>
-                    <Link href={`/projects/${project.id}`} passHref>
+                    <Link href={`/projects/${project._id}`} passHref>
                       <Box cursor="pointer">
-                        <Text fontWeight="bold">{project.name}</Text>
-                        <Text fontSize="sm" color="gray.300">Cliente: {project.client.value}</Text>
+                        <Text fontWeight="bold">{project.nome}</Text>
+                        <Text fontSize="sm" color="gray.300">Cliente: {project.cliente?.nome}</Text>
                       </Box>
                     </Link>
                   </Td>
@@ -68,26 +69,13 @@ export default function Project({projects}: ProjectProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async() => {
-  const response: any = await fauna.query(
-    q.Map(
-      q.Paginate(
-        q.Match(q.Index('ix_project')),
-      ),
-      q.Lambda("X", q.Get(q.Var("X")))
-    )
-  )
-
-  const projects = response.data.map(res => {
-    return {
-      name: res.data.name,
-      id: res.data.id,
-      client: res.data.client,
-    }
-  });
+  const response = await apiNest.get('projeto');
   
+  console.log(response.data);
+
   return {
     props: {
-      projects
+      projects: response.data
     }
   }
 }
