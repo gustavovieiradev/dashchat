@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, useToast, VStack } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, FormHelperText, Heading, HStack, Table, Tbody, Td, Text, Thead, Tr, useToast, VStack } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -13,6 +13,8 @@ import { fauna } from "../../services/fauna";
 import { query as q } from 'faunadb';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useState } from "react";
+import { apiNest } from "../../services/api-nest";
 
 type IntentFormData = {
   name: string;
@@ -31,32 +33,39 @@ interface CreateIntentProps {
   projects: Project[];
 }
 
+interface PostIntent {
+  mensagem: string[];
+  utterances: string[];
+  intent: string;
+  template: string;
+  projeto: string;
+
+}
+
 const formSchema = yup.object().shape({
   id_project: yup.string().required('Campo obrigatório'),
   name: yup.string().required('Campo obrigatório'),
-  text_input: yup.string().required('Campo obrigatório'),
-  text_output: yup.string().required('Campo obrigatório'),
 })
 
-export default function CreateIntent({projects}: CreateIntentProps) {
+export default function CreateIntent({ projects }: CreateIntentProps) {
+  const [textInput, setTextInput] = useState<string>('');
+  const [textsInput, setTextsInput] = useState<string[]>([]);
+  const [textOutput, setTextOutput] = useState<string>('');
+  const [textsOutput, setTextsOutput] = useState<string[]>([]);
   const router = useRouter();
   const toast = useToast()
-  const {register, handleSubmit, formState} = useForm({
+  const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(formSchema)
   });
 
-  const {errors} = formState;
+  const { errors } = formState;
 
   const handleSave: SubmitHandler<IntentFormData> = async (values) => {
-    const params = {
-      ...values,
-      id: v4(),
-      project: projects.find(p => values.id_project === p.id)
-    };
+    const params = formatData(values);
 
-    delete params.id_project;
+    console.log(params);
 
-    await api.post('/intent/create', params);
+    await apiNest.post('/conversa', params);
     toast({
       title: "Intenção salva com sucesso",
       status: "success",
@@ -64,8 +73,34 @@ export default function CreateIntent({projects}: CreateIntentProps) {
       isClosable: true,
     })
     router.push('/intent');
+  }
 
-  } 
+  function formatData(data: IntentFormData): PostIntent {
+    const formData = {
+      mensagem: textsOutput,
+      utterances: textsInput,
+      intent: data.name.toUpperCase(),
+      template: 'text',
+      projeto: data.id_project,
+    }
+    return formData;
+  }
+
+  function handleAddTextInput(): void {
+    setTextsInput([
+      ...textsInput,
+      textInput
+    ]);
+    setTextInput('');
+  }
+
+  function handleAddTextOutput(): void {
+    setTextsOutput([
+      ...textsOutput,
+      textOutput
+    ]);
+    setTextOutput('');
+  }
 
   return (
     <Box>
@@ -83,11 +118,47 @@ export default function CreateIntent({projects}: CreateIntentProps) {
               <Input name="name" label="Nome da intenção" {...register('name')} error={errors.name} />
             </Box>
             <Box w="100%">
-              <Input name="text_input" label="Texto de entrada" {...register('text_input')} error={errors.text_input} />
+              <Input name="text_input" label="Textos de entrada" onChange={(ev) => setTextInput(ev.target.value)} value={textInput} textHelp="Adicione um ou mais texto de entrada" />
             </Box>
+            <Box>
+              <Button as="a" colorScheme="pink" onClick={handleAddTextInput}>Adicionar texto de entrada</Button>
+            </Box>
+            {textsInput.length > 0 && (
+              <Flex justifyContent="flex-start" width="100%">
+                <Table colorScheme="whiteAlpha">
+                  <Tbody>
+                    {textsInput.map(text => (
+                      <Tr>
+                        <Td>
+                          <Text fontWeight="bold">{text}</Text>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Flex>
+            )}
             <Box w="100%">
-              <Input name="text_output" label="Texto de saída" {...register('text_output')} error={errors.text_output} />
+              <Input name="text_output" label="Texto de saída" onChange={(ev) => setTextOutput(ev.target.value)} value={textOutput} textHelp="Adicione um ou mais texto de saída"/>
             </Box>
+            <Box>
+              <Button as="a" colorScheme="pink" onClick={handleAddTextOutput}>Adicionar texto de saída</Button>
+            </Box>
+            {textsOutput.length > 0 && (
+              <Flex justifyContent="flex-start" width="100%">
+                <Table colorScheme="whiteAlpha">
+                  <Tbody>
+                    {textsOutput.map(text => (
+                      <Tr>
+                        <Td>
+                          <Text fontWeight="bold">{text}</Text>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Flex>
+            )}
           </VStack>
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
@@ -103,23 +174,16 @@ export default function CreateIntent({projects}: CreateIntentProps) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async() => {
-  const response: any = await fauna.query(
-    q.Map(
-      q.Paginate(
-        q.Match(q.Index('ix_project')),
-      ),
-      q.Lambda("X", q.Get(q.Var("X")))
-    )
-  )
+export const getServerSideProps: GetServerSideProps = async () => {
+  const response = await apiNest.get('/projeto');
 
   const projects = response.data.map(res => {
     return {
-      id: res.data.id,
-      value: res.data.name,
+      id: res._id,
+      value: res.nome,
     }
   });
-  
+
   return {
     props: {
       projects
