@@ -20,7 +20,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       return res.json({ success: true });
     } catch (err) {
-      return res.status(500).json({ err })
+      await fauna.query(
+        q.Create(
+          q.Collection('config'),
+          { data: req.body }
+        )
+      )
+      return res.json({ success: true });
     }
   }
 }

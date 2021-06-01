@@ -71,6 +71,8 @@ export default function Signin() {
         <Button type="submit" mt="6" colorScheme="whiteAlpha" onClick={handlePageResetPassword}>Esqueceu a senha?</Button>
       </Flex>
 
+      <iframe src="https://dashchatinterface.vercel.app/2b5b721d-9a27-48e6-b7ad-1a67b8f762ad" style={{position: "absolute", bottom: "10px", right: "10px", height: "800px", width: "400px"}} title="Iframe Example"></iframe>
+
     </Flex>
   )
 }
