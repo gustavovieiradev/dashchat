@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, FormHelperText, Heading, HStack, Table, Tbody, Td, Text, Thead, Tr, useToast, VStack } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, FormHelperText, Heading, HStack, SimpleGrid, Table, Tbody, Td, Text, Thead, Tr, useToast, VStack } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -31,6 +31,12 @@ interface Project {
 
 interface CreateIntentProps {
   projects: Project[];
+  conversas: Conversa[];
+}
+
+interface Conversa {
+  id: string;
+  value: string;
 }
 
 interface PostIntent {
@@ -39,19 +45,24 @@ interface PostIntent {
   intent: string;
   template: string;
   projeto: string;
-
 }
+
+interface Suggestion {}
+
 
 const formSchema = yup.object().shape({
   id_project: yup.string().required('Campo obrigatório'),
   name: yup.string().required('Campo obrigatório'),
 })
 
-export default function CreateIntent({ projects }: CreateIntentProps) {
+export default function CreateIntent({ projects, conversas }: CreateIntentProps) {
   const [textInput, setTextInput] = useState<string>('');
   const [textsInput, setTextsInput] = useState<string[]>([]);
   const [textOutput, setTextOutput] = useState<string>('');
   const [textsOutput, setTextsOutput] = useState<string[]>([]);
+  const [textSuggestion, setTextSuggestion] = useState<string>('');
+  const [suggestion, setSuggestion] = useState<string>('');
+
   const router = useRouter();
   const toast = useToast()
   const { register, handleSubmit, formState } = useForm({
@@ -102,6 +113,11 @@ export default function CreateIntent({ projects }: CreateIntentProps) {
     setTextOutput('');
   }
 
+  function handleAddSuggestion(): void {
+    console.log(suggestion);
+    console.log(textSuggestion);
+  }
+
   return (
     <Box>
       <Header />
@@ -139,7 +155,7 @@ export default function CreateIntent({ projects }: CreateIntentProps) {
               </Flex>
             )}
             <Box w="100%">
-              <Input name="text_output" label="Texto de saída" onChange={(ev) => setTextOutput(ev.target.value)} value={textOutput} textHelp="Adicione um ou mais texto de saída"/>
+              <Input name="text_output" label="Texto de saída" onChange={(ev) => setTextOutput(ev.target.value)} value={textOutput} textHelp="Adicione um ou mais texto de saída" />
             </Box>
             <Box>
               <Button as="a" colorScheme="pink" onClick={handleAddTextOutput}>Adicionar texto de saída</Button>
@@ -159,6 +175,13 @@ export default function CreateIntent({ projects }: CreateIntentProps) {
                 </Table>
               </Flex>
             )}
+            <SimpleGrid flex="1" gap="4" minChildWidth="320px" align="flex-start" width="100%">
+              <Input name="text_suggestion" label="Texto de sugestão" textHelp="Adicione um ou mais texto de saída" onChange={(ev) => setTextSuggestion(ev.target.value)} />
+              <Select name="sugestion" placeholder="Selecione" label="Sugestões" options={conversas} textHelp="Adicione uma ou mais sugestões" onChange={(ev) => setSuggestion(ev.target.value)} />
+            </SimpleGrid>
+            <Box>
+              <Button as="a" colorScheme="pink" onClick={handleAddSuggestion}>Adicionar sugestão</Button>
+            </Box>
           </VStack>
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
@@ -184,9 +207,19 @@ export const getServerSideProps: GetServerSideProps = async () => {
     }
   });
 
+  const responseIntent = await apiNest.get('/conversa');
+
+  const conversas = responseIntent.data.map(res => {
+    return {
+      id: res._id,
+      value: res.intent,
+    }
+  })
+
   return {
     props: {
-      projects
+      projects,
+      conversas
     }
   }
 }
